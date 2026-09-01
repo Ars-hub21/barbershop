@@ -1,0 +1,91 @@
+<!-- frontend\client\reviews.html отзывы -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>БАРБЕРШОП — Отзывы</title>
+
+  <script src="js/core/site-config.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Syncopate:wght@700&family=Nunito:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="reviews">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <h1 class="address">
+          <i class="fas fa-map-pin"></i>
+          <span class="address-text">Урус-Мартан, ул. им. Шейха Солса-Хаджи Яндарова, 147</span>
+          <a href="map.html" class="map-link" target="_blank">
+            <i class="fas fa-map"></i> Карта
+          </a>
+        </h1>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <h2 class="step-title"><i class="fas fa-star" style="color:var(--star-active);"></i> Отзывы</h2>
+
+    <div class="reviews-container">
+      <!-- Форма отзыва -->
+      <div class="review-form">
+        <h3 style="margin-bottom:1rem;color:var(--text-secondary);">Оставить отзыв</h3>
+        <div class="form-group">
+          <label>Выберите мастера</label>
+          <select id="reviewMaster">
+            <option value="Дени">Дени</option>
+            <option value="Бауди">Бауди</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Оценка</label>
+          <div class="star-rating" id="starRating">
+            <span class="star" data-value="1"><i class="fas fa-star"></i></span>
+            <span class="star" data-value="2"><i class="fas fa-star"></i></span>
+            <span class="star" data-value="3"><i class="fas fa-star"></i></span>
+            <span class="star" data-value="4"><i class="fas fa-star"></i></span>
+            <span class="star" data-value="5"><i class="fas fa-star"></i></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Ваше имя</label>
+          <input type="text" id="reviewName" placeholder="Введите ваше имя" />
+        </div>
+        <div class="form-group">
+          <label>Текст отзыва</label>
+          <textarea id="reviewText" rows="3" placeholder="Расскажите о вашем опыте..."></textarea>
+        </div>
+        <button class="btn btn-primary" id="submitReview">Отправить отзыв</button>
+      </div>
+
+      <!-- Список отзывов -->
+      <div id="reviewsList" class="reviews-list"></div>
+    </div>
+
+    <div class="navigation-buttons">
+      <a href="index.html" class="btn btn-secondary">На главную</a>
+    </div>
+  </main>
+
+  <!-- НОВЫЕ СКРИПТЫ -->
+  <script src="js/core/config.js"></script>
+  <script src="js/core/api.js"></script>
+  <script src="js/core/storage.js"></script>
+  <script src="js/core/global-cache.js"></script>
+  <script src="js/data/masters.js"></script>
+  <script src="js/data/services.js"></script>
+  <script src="js/utils/time.js"></script>
+  <script src="js/utils/helpers.js"></script>
+  <script src="js/utils/scissors-loader.js"></script>
+  <script src="js/pages/reviews-page.js"></script>
+  <script src="js/core/init.js"></script>
+</body>
+</html>
