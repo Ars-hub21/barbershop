@@ -135,14 +135,14 @@ body::before {
    ========================================================================== */
 .step-title {
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   font-weight: 700;
   text-transform: var(--heading-transform);
-  letter-spacing: 2px;
-  margin-bottom: 2rem;
+  letter-spacing: var(--heading-tracking);
+  margin-bottom: 1.5rem;
   color: var(--text-primary);
-  border-left: 3px solid var(--accent);
-  padding-left: 1.2rem;
+  border-left: 5px solid var(--accent);
+  padding-left: 1rem;
   position: relative;
 }
 
@@ -159,7 +159,7 @@ body::before {
 .master-card {
   background: var(--bg-card);
   border-radius: var(--radius-lg);
-  padding: 2rem 1.5rem;
+  padding: 1.5rem;
   border: 1px solid var(--border-color);
   transition: var(--transition);
   cursor: pointer;
@@ -197,15 +197,15 @@ body::before {
 
 /* Фото мастера */
 .master-photo, .master-avatar {
-  width: 90px;
-  height: 90px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  margin: 0 auto 1.2rem;
+  margin: 0 auto 0.8rem;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border: 2px solid var(--border-accent);
+  border: 3px solid var(--accent);
   background: var(--bg-secondary);
   transition: var(--transition);
   position: relative;
@@ -228,20 +228,20 @@ body::before {
 }
 
 .master-name {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: normal;
   margin-bottom: 0.2rem;
   color: var(--text-primary);
 }
 
 .master-title {
   color: var(--text-secondary);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   text-transform: var(--heading-transform);
-  letter-spacing: 1px;
+  letter-spacing: normal;
   font-weight: 500;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.3rem;
 }
 
 /* Рейтинг */
@@ -281,7 +281,7 @@ body::before {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-color);
   padding: 0.3rem 0.6rem;
-  border-radius: var(--radius);
+  border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
@@ -335,7 +335,7 @@ body::before {
   width: 20px;
   height: 20px;
   border: 2px solid var(--text-muted);
-  border-radius: var(--radius);
+  border-radius: 5px;
   outline: none;
   cursor: pointer;
   transition: var(--transition);
@@ -824,7 +824,7 @@ body::before {
   width: 18px;
   height: 18px;
   border: 2px solid var(--text-muted);
-  border-radius: var(--radius);
+  border-radius: 5px;
   outline: none;
   cursor: pointer;
   transition: var(--transition);
@@ -1080,7 +1080,7 @@ body::before {
   width: 18px;
   height: 18px;
   border: 2px solid var(--text-muted);
-  border-radius: var(--radius);
+  border-radius: 5px;
   outline: none;
   cursor: pointer;
   transition: var(--transition);
@@ -1597,24 +1597,24 @@ body::before {
   }
 
   .step-title {
-    font-size: 1.2rem;
-    padding-left: 1rem;
+    font-size: 1.4rem;
+    padding-left: 0.8rem;
     margin-bottom: 1.5rem;
   }
 
   /* Сетка мастеров в 2 колонки */
   .masters-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: 0.8rem;
   }
 
   .master-card {
-    padding: 1.5rem 1rem;
+    padding: 1rem;
   }
 
   .master-photo, .master-avatar {
-    width: 76px;
-    height: 76px;
+    width: 70px;
+    height: 70px;
   }
 
   .master-name {
@@ -1695,50 +1695,38 @@ body::before {
    Маленькие смартфоны (до 480px)
    ========================================================================== */
 @media (max-width: 480px) {
+  /* Классическая сетка 2×N карточек-квадратов сохраняется и на маленьких
+     экранах (как в исходном дизайне) — просто уменьшаем размеры, без
+     перехода на горизontальный список. */
   .masters-grid {
-    grid-template-columns: 1fr; /* На совсем маленьких экранах мастера в одну строку для читаемости */
-    gap: 0.8rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
   }
 
   .master-card {
-    padding: 1.2rem;
-    display: flex;
-    align-items: center;
-    text-align: left;
-    gap: 1rem;
-  }
-
-  .master-card::after {
-    background: radial-gradient(circle at 0% 50%, rgba(var(--accent-rgb), 0.08), transparent 70%);
+    padding: 0.8rem;
   }
 
   .master-photo, .master-avatar {
-    margin: 0;
-    width: 64px;
-    height: 64px;
-    flex-shrink: 0;
-  }
-
-  .master-card-info {
-    flex: 1;
+    width: 55px;
+    height: 55px;
   }
 
   .master-name {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
   }
 
   .master-title {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     margin-bottom: 0.2rem;
   }
 
   .master-rating {
-    justify-content: flex-start;
-    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    margin-bottom: 0.4rem;
   }
 
   .master-slots {
-    justify-content: flex-start;
     margin-top: 0.4rem;
   }
 

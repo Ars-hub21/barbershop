@@ -45,8 +45,8 @@
   --shadow-glow: 0 0 20px rgba(197, 160, 89, 0.15);
 
   /* ---------- Форма/геометрия ---------- */
-  --radius: 4px;
-  --radius-lg: 8px;
+  --radius: 12px;
+  --radius-lg: 12px;
   --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   /* ---------- Статусы ---------- */
@@ -56,15 +56,15 @@
   --star-inactive: #2c303b;
 
   /* ---------- Шрифты ---------- */
-  --font-body: 'Montserrat', sans-serif;
-  --font-display: 'Syncopate', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-display: 'Inter', sans-serif;
 
   /* ---------- Характер (буквы/регистр) ---------- */
-  --heading-transform: uppercase;
-  --heading-tracking: 2px;
-  --btn-transform: uppercase;
-  --btn-tracking: 1.5px;
-  --btn-weight: 700;
+  --heading-transform: none;
+  --heading-tracking: normal;
+  --btn-transform: none;
+  --btn-tracking: normal;
+  --btn-weight: 600;
 
   /* ---------- Декоративная деталь тэглайна ---------- */
   --tagline-style: italic;
