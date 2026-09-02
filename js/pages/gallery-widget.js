@@ -43,7 +43,7 @@ const GalleryWidget = {
           '<div class="gallery-caption">' + item.title + '</div>' +
         '</div>'
       );
-    }).join('') + '<div class="gallery-note">Фото в галерее — демонстрационные плейсхолдеры</div>';
+    }).join('');
 
     // Проставляем before-картинку каждой полоске (шире карточки в 6 раз — см. CSS)
     grid.querySelectorAll('.gallery-card').forEach(function (card, idx) {

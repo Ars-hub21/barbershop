@@ -47,7 +47,10 @@ const MASTERS_BY_GENDER = {
   // как описано в barber_panel/masters.html).
   feminine: [
     { id: 101, key: 'Zarina', name: 'Зарина', title: 'Мастер маникюра', avatar: 'placeholder-avatar.svg' },
-    { id: 102, key: 'Amina', name: 'Амина', title: 'Мастер маникюра и педикюра', avatar: 'placeholder-avatar.svg' }
+    { id: 102, key: 'Amina', name: 'Амина', title: 'Мастер маникюра и педикюра', avatar: 'placeholder-avatar.svg' },
+    { id: 103, key: 'Madina', name: 'Мадина', title: 'Парикмахер-стилист', avatar: 'placeholder-avatar.svg' },
+    { id: 104, key: 'Hava', name: 'Хава', title: 'Косметолог', avatar: 'placeholder-avatar.svg' },
+    { id: 105, key: 'Leyla', name: 'Лейла', title: 'Визажист', avatar: 'placeholder-avatar.svg' }
   ]
 };
 
