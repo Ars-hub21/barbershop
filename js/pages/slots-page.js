@@ -165,7 +165,7 @@ const SlotsPage = {
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
         // Проверяем, есть ли уже данные по этому мастеру и дате в памяти
-        const masterName = self.masterName || 'Дени'; // берем любого для базовой проверки наличия ключа даты
+        const masterName = self.masterName || (typeof masters !== 'undefined' && masters[0] ? masters[0].name : null); // берем любого для базовой проверки наличия ключа даты
         const hasData = GlobalCache.slots[masterName] && GlobalCache.slots[masterName][date] !== undefined;
 
         if (hasData) {

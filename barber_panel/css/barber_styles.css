@@ -1,0 +1,1605 @@
+/* ============================================
+   barber_panel/barber_styles.css — стили панели барберов
+   ============================================ */
+/* Цвета/шрифты/форма панели теперь наследуются из ЕДИНОЙ темы сайта
+   (../css/theme.css, подключена в <head> ДО этого файла) — те же
+   переменные --bg-primary/--accent/--font-body/... что и на клиентском
+   сайте. Здесь остаются только токены, специфичные для панели, которых
+   нет в общей теме — выведены из неё же, чтобы не рассинхронизироваться. */
+:root {
+  --bg-card-hover: var(--bg-input);
+  --accent-hover: var(--accent-light);
+  --shadow: var(--shadow-md);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+}
+
+/* ========== Вход ========== */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+}
+
+.login-box {
+  background: var(--bg-card);
+  padding: 3rem 2.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  border: 1px solid var(--border-color);
+}
+
+.login-icon {
+  font-size: 3rem;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.login-box h1 {
+  font-family: var(--font-display);
+  text-transform: var(--heading-transform);
+  letter-spacing: var(--heading-tracking);
+  font-size: 1.8rem;
+  margin-bottom: 0.3rem;
+}
+
+.login-subtitle {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.login-box .form-group {
+  margin-bottom: 1rem;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.login-box input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.login-error {
+  color: var(--danger);
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+  min-height: 1.5rem;
+}
+
+/* ========== Хедер ========== */
+.dashboard-header {
+  background: var(--bg-secondary);
+  padding: 0.8rem 0;
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-header .header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.dashboard-title {
+  font-family: var(--font-display);
+  text-transform: var(--heading-transform);
+  letter-spacing: var(--heading-tracking);
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dashboard-title i {
+  color: var(--accent);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.date-navigation {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.date-navigation button {
+  background: var(--bg-input);
+  border: none;
+  color: var(--text-primary);
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.date-navigation button:hover {
+  background: var(--border-color);
+}
+
+.date-navigation #currentDateDisplay {
+  font-weight: 600;
+  min-width: 120px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+/* ========== Кнопки ========== */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-weight: var(--btn-weight);
+  text-transform: var(--btn-transform);
+  letter-spacing: var(--btn-tracking);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--border-color);
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background: var(--border-color);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+.btn-accent:hover {
+  background: var(--accent-hover);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: var(--danger);
+}
+
+.btn-sm {
+  padding: 0.25rem 0.7rem;
+  font-size: 0.75rem;
+}
+
+.btn-large {
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+}
+
+/* ========== Дашборд ========== */
+/* Сетка колонок мастеров — CSS Grid с auto-fit вместо ручных долей.
+   Подстраивается САМА под любое число мастеров (1-50): один мастер —
+   одна аккуратная колонка по центру, а не пол-экрана; десятки мастеров —
+   столько колонок, сколько влезает по ширине, остальные переносятся на
+   следующую строку. Комбинируется с "схлопыванием" колонки по двойному
+   клику (components/columnToggle.js) — так с большим числом мастеров
+   ненужные колонки можно свернуть до заголовка. */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.master-column {
+  width: 100%;
+  max-width: 480px;
+  justify-self: center;
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
+}
+
+/* Когда мастеров очень много (примерно от 5 и выше), одной колонке незачем
+   тянуться до 480px — даём сетке больше "воздуха" между колонками и чуть
+   уменьшаем минимальную ширину трека, чтобы на широких экранах помещалось
+   больше колонок одновременно. */
+.dashboard-grid[data-density="compact"] {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.dashboard-grid[data-density="compact"] .master-column {
+  max-width: 340px;
+  min-height: 420px;
+}
+
+/* Адаптивность для панели */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    gap: 1rem;
+    grid-template-columns: 1fr;
+  }
+
+  .master-column {
+    max-width: none;
+    min-height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .master-column {
+    min-height: 350px;
+  }
+}
+
+.column-header {
+  background: var(--bg-card);
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  border-bottom: 2px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.column-header .master-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--accent);
+  flex-shrink: 0;
+}
+
+.column-header .master-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.column-title {
+  flex: 1;
+}
+
+.column-title h2 {
+  font-family: var(--font-display);
+  text-transform: var(--heading-transform);
+  letter-spacing: var(--heading-tracking);
+  font-size: 1.3rem;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.column-title h2:hover {
+  color: var(--accent);
+}
+
+.column-title .master-status {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: block;
+}
+
+.column-title .master-rating-small {
+  font-size: 0.8rem;
+  color: var(--star-active);
+  display: block;
+}
+
+.btn-add-busy {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+.column-content {
+  padding: 0.8rem;
+  flex: 1;
+  overflow-y: auto;
+  min-height: calc(100vh - 260px);
+}
+
+/* ============================================
+   КАРТОЧКА ЗАПИСИ (ЗАКАЗА)
+   ============================================ */
+
+.order-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 15px;
+    transition: var(--transition);
+}
+
+.order-card:hover {
+    border-color: var(--text-muted);
+}
+
+/* ===== 1 СТРОКА: время + имя клиента (в одну строку) ===== */
+.order-card .order-row-top {
+    display: flex;
+    justify-content: space-between;  /* ← Время слева, имя справа */
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: nowrap;
+    min-height: 1.8rem;
+    width: 100%;
+}
+
+.order-card .order-time {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;  /* Не сжимается */
+    white-space: nowrap;
+}
+
+.order-card .order-client {
+    font-weight: 600;
+    font-size: 1rem;
+    text-align: right;  /* ← ПРИЖИМАЕМ К ПРАВОМУ КРАЮ */
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===== 2 СТРОКА: длительность + телефон (в одну строку) ===== */
+.order-card .order-row-middle {
+    display: flex;
+    justify-content: space-between;  /* ← Длительность слева, телефон справа */
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: nowrap;
+    margin-top: 0.1rem;
+    width: 100%;
+}
+
+.order-card .order-duration {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.order-card .order-phone {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-align: right;  /* ← ПРИЖИМАЕМ К ПРАВОМУ КРАЮ */
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.order-card .order-phone a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.order-card .order-phone a:hover {
+    text-decoration: underline;
+}
+
+/* ===== 3 СТРОКА: услуги ===== */
+.order-card .order-services {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 0.2rem;
+}
+
+/* ===== 4 СТРОКА: комментарий ===== */
+.order-card .order-comment {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+    font-style: italic;
+}
+
+/* ===== 5 СТРОКА: цена + индикатор + кнопка ===== */
+.order-card .order-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.3rem;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.order-card .order-price-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.order-card .order-price {
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.1rem 0.3rem;
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.order-card .order-price:hover {
+    background: var(--border-color);
+}
+
+/* ===== ИНДИКАТОР СИНХРОНИЗАЦИИ ===== */
+.order-card .sync-indicator {
+    font-size: 0.9rem;
+    cursor: help;
+    transition: all 0.3s ease;
+    margin-left: 0;
+}
+
+.order-card .sync-indicator:hover {
+    transform: scale(1.3);
+}
+
+/* ===== КНОПКА ОТМЕНЫ ===== */
+.order-card .order-actions .btn-cancel {
+    background: var(--danger);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.order-card .order-actions .btn-cancel:hover {
+    background: var(--danger);
+}
+
+/* ===== РЕДАКТИРОВАНИЕ ЦЕНЫ ===== */
+.edit-price-input {
+    background: var(--bg-input);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    color: var(--text-primary);
+    padding: 0.1rem 0.3rem;
+    width: 70px;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ
+   ============================================ */
+@media (max-width: 480px) {
+    .order-card {
+        padding: 0.4rem 0.5rem;
+    }
+    
+    .order-card .order-row-top {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 0.4rem;
+    }
+    
+    .order-card .order-time {
+        font-size: 0.9rem;
+    }
+    
+    .order-card .order-client {
+        font-size: 0.85rem;
+        text-align: right;
+        max-width: 60%;
+    }
+    
+    .order-card .order-row-middle {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 0.4rem;
+    }
+    
+    .order-card .order-duration {
+        font-size: 0.7rem;
+    }
+    
+    .order-card .order-phone {
+        font-size: 0.65rem;
+        text-align: right;
+        max-width: 60%;
+    }
+    
+    .order-card .order-services {
+        font-size: 0.75rem;
+    }
+    
+    .order-card .order-comment {
+        font-size: 0.7rem;
+    }
+    
+    .order-card .order-price {
+        font-size: 0.85rem;
+    }
+    
+    .order-card .sync-indicator {
+        font-size: 0.7rem;
+    }
+    
+    .order-card .order-actions .btn-cancel {
+        font-size: 0.65rem;
+        padding: 0.1rem 0.4rem;
+    }
+    
+    .order-card .order-bottom-row {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+    
+    .edit-price-input {
+        width: 55px;
+        font-size: 0.8rem;
+    }
+}
+
+/* ========== Карточка занятости ========== */
+.busy-slot-card {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition);
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  border-left: 4px solid var(--danger);
+  /* ← Красная полоса слева, чтобы отличать */
+}
+
+.busy-slot-card:hover {
+  border-color: var(--text-muted);
+}
+
+.busy-slot-card .slot-info {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.busy-slot-card .slot-time {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.busy-slot-card .slot-duration {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.busy-slot-card .slot-price {
+  font-weight: 700;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.busy-slot-card .slot-price:hover {
+  background: var(--border-color);
+}
+
+.busy-slot-card .slot-actions {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.busy-slot-card .slot-actions .btn-delete {
+  background: transparent;
+  color: var(--danger);
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 0.2rem;
+}
+
+.busy-slot-card .slot-actions .btn-delete:hover {
+  color: var(--danger);
+}
+
+/* ===== СТАТУС СИНХРОНИЗАЦИИ ЗАНЯТОСТИ ===== */
+.slot-sync-status {
+  font-size: 0.8rem;
+  margin-left: 0.3rem;
+  cursor: help;
+  transition: all 0.3s ease;
+}
+
+.slot-sync-status:hover {
+  transform: scale(1.2);
+}
+
+/* ============================================
+   КНОПКА ОТМЕНЫ ДЛЯ ЗАНЯТОСТИ
+   Используем те же стили, что и для заказов
+   ============================================ */
+
+.busy-slot-card .order-actions .btn-cancel {
+    background: var(--danger);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.busy-slot-card .order-actions .btn-cancel:hover {
+    background: var(--danger);
+}
+
+.busy-slot-card .order-actions {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+    flex-wrap: wrap;
+}
+
+/* ===== АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ ===== */
+@media (max-width: 480px) {
+    .busy-slot-card .order-actions .btn-cancel {
+        font-size: 0.65rem;
+        padding: 0.1rem 0.4rem;
+    }
+}
+
+/* ========== Попап ========== */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.popup-content {
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.popup-header h3 {
+  font-size: 1.2rem;
+}
+
+.popup-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.6rem;
+  cursor: pointer;
+  padding: 0 0.3rem;
+}
+
+.popup-close:hover {
+  color: var(--text-primary);
+}
+
+.popup-duration-display {
+  background: var(--bg-card);
+  padding: 0.6rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.popup-duration-display strong {
+  color: var(--accent);
+}
+
+.popup-body .form-group {
+  margin-bottom: 0.8rem;
+}
+
+.popup-body .form-group label {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.popup-body .form-group input {
+  width: 100%;
+  padding: 0.5rem 0.8rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.popup-body .form-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ========== Пустые состояния ========== */
+.empty-state {
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 1.5rem 0;
+  font-style: italic;
+}
+
+/* ========== История ========== */
+.history-controls {
+  margin-bottom: 1.5rem;
+}
+
+.history-controls .form-group {
+  display: inline-block;
+}
+
+.history-controls input[type="month"] {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  padding: 0.4rem 0.8rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.history-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+.stat-card .stat-label {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  display: block;
+}
+
+.stat-card .stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.history-list .history-item {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.6rem;
+  border: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.history-item .h-date {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.history-item .h-client {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.history-item .h-services {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.history-item .h-price {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+
+/* ========== ОТЗЫВЫ В ПАНЕЛИ ========== */
+.reviews-filter {
+  margin-bottom: 1.5rem;
+}
+
+.reviews-filter .form-group {
+  display: inline-block;
+}
+
+.reviews-filter select {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  padding: 0.4rem 0.8rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.reviews-stats {
+  margin-bottom: 1.5rem;
+}
+
+.reviews-list .review-item {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.6rem;
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.reviews-list .review-item:hover {
+  border-color: var(--accent);
+}
+
+/* ===== ВЕРХНЯЯ СТРОКА: Клиент (слева) + Мастер (справа) ===== */
+.review-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+
+.review-client-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.review-master-name {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+/* ===== НИЖНЯЯ СТРОКА: Дата (слева) + Звезды (справа) ===== */
+.review-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.review-client-date {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.review-stars {
+  color: var(--star-active);
+  font-size: 1rem;
+}
+
+.review-stars .star-empty {
+  color: var(--star-inactive);
+}
+
+/* ===== ТЕКСТ ОТЗЫВА ===== */
+.review-text {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ
+   ============================================ */
+@media (max-width: 768px) {
+  .review-top-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.2rem;
+  }
+
+  .review-bottom-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.2rem;
+  }
+
+  .review-text {
+    text-align: center;
+    font-size: 0.9rem;
+  }
+
+  .reviews-list .review-item {
+    padding: 0.6rem 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .review-client-name {
+    font-size: 0.85rem;
+  }
+
+  .review-master-name {
+    font-size: 0.95rem;
+  }
+
+  .review-client-date {
+    font-size: 0.7rem;
+  }
+
+  .review-stars {
+    font-size: 0.9rem;
+  }
+
+  .review-text {
+    font-size: 0.85rem;
+  }
+
+  .reviews-list .review-item {
+    padding: 0.5rem;
+  }
+}
+
+/* ========== Адаптивность ========== */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .column-content {
+    min-height: 450px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0.8rem;
+  }
+
+  .dashboard-header .header-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .date-navigation {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .column-header {
+    flex-wrap: wrap;
+  }
+
+  .column-header .master-avatar {
+    width: 35px;
+    height: 35px;
+  }
+
+  .column-title h2 {
+    font-size: 1.1rem;
+  }
+
+  .btn-add-busy {
+    width: 100%;
+    text-align: center;
+  }
+
+  .history-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .history-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .popup-content {
+    padding: 1.2rem;
+    margin: 0 0.8rem;
+  }
+
+  .login-box {
+    padding: 2rem 1.5rem;
+  }
+
+  .dashboard-title {
+    font-size: 1.2rem;
+  }
+
+  .dashboard-grid {
+    gap: 0.8rem;
+  }
+
+  .column-content {
+    padding: 0.6rem;
+    min-height: 400px;
+  }
+
+  .order-card {
+    padding: 0.4rem 0.6rem;
+    margin-bottom: 10px;
+  }
+
+  .order-card .order-time {
+    font-size: 1rem;
+  }
+
+  .order-card .order-client {
+    font-size: 0.9rem;
+  }
+
+  .order-card .order-services {
+    font-size: 0.75rem;
+  }
+
+  .order-card .order-price {
+    font-size: 0.9rem;
+  }
+
+  .busy-slot-card {
+    padding: 0.4rem 0.6rem;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+
+  .busy-slot-card .slot-info {
+    gap: 0.3rem;
+  }
+
+  .busy-slot-card .slot-time {
+    font-size: 0.8rem;
+  }
+
+  .busy-slot-card .slot-price {
+    font-size: 0.8rem;
+  }
+
+  .stat-card .stat-value {
+    font-size: 1.6rem;
+  }
+
+  .review-item .review-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .date-navigation #currentDateDisplay {
+    font-size: 0.8rem;
+    min-width: 80px;
+  }
+
+  .btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .btn-sm {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .dashboard-title {
+    font-size: 1rem;
+  }
+
+  .column-header {
+    padding: 0.5rem;
+    gap: 0.4rem;
+  }
+
+  .column-header .master-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .column-title h2 {
+    font-size: 0.95rem;
+  }
+
+  .column-title .master-status {
+    font-size: 0.65rem;
+  }
+
+  .column-title .master-rating-small {
+    font-size: 0.7rem;
+  }
+
+  .column-content {
+    padding: 0.4rem;
+    min-height: 350px;
+  }
+
+  .order-card {
+    padding: 0.3rem 0.4rem;
+    margin-bottom: 8px;
+  }
+
+  .order-card .order-time {
+    font-size: 0.9rem;
+  }
+
+  .order-card .order-client {
+    font-size: 0.8rem;
+  }
+
+  .order-card .order-services {
+    font-size: 0.7rem;
+  }
+
+  .order-card .order-duration {
+    font-size: 0.7rem;
+  }
+
+  .order-card .order-phone {
+    font-size: 0.65rem;
+  }
+
+  .order-card .order-price {
+    font-size: 0.8rem;
+  }
+
+  .order-card .order-actions .btn {
+    font-size: 0.6rem;
+    padding: 0.1rem 0.4rem;
+  }
+
+  .edit-price-input {
+    width: 55px;
+    font-size: 0.8rem;
+  }
+
+  .busy-slot-card {
+    padding: 0.3rem 0.4rem;
+  }
+
+  .busy-slot-card .slot-time {
+    font-size: 0.7rem;
+  }
+
+  .busy-slot-card .slot-duration {
+    font-size: 0.65rem;
+  }
+
+  .busy-slot-card .slot-price {
+    font-size: 0.7rem;
+  }
+
+  .busy-slot-card .slot-actions .btn-delete {
+    font-size: 0.9rem;
+  }
+
+  .popup-content {
+    padding: 1rem;
+  }
+
+  .popup-header h3 {
+    font-size: 1rem;
+  }
+
+  .popup-duration-display {
+    font-size: 0.85rem;
+    padding: 0.4rem;
+  }
+
+  .popup-body .form-group label {
+    font-size: 0.8rem;
+  }
+
+  .popup-body .form-group input {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .history-item {
+    padding: 0.4rem 0.6rem;
+  }
+
+  .history-item .h-date {
+    font-size: 0.8rem;
+  }
+
+  .history-item .h-client {
+    font-size: 0.8rem;
+  }
+
+  .history-item .h-services {
+    font-size: 0.7rem;
+  }
+
+  .history-item .h-price {
+    font-size: 0.8rem;
+  }
+
+  .stat-card {
+    padding: 0.8rem;
+  }
+
+  .stat-card .stat-value {
+    font-size: 1.4rem;
+  }
+
+  .stat-card .stat-label {
+    font-size: 0.75rem;
+  }
+
+  .review-item {
+    padding: 0.5rem;
+  }
+
+  .review-item .review-name {
+    font-size: 0.85rem;
+  }
+
+  .review-item .review-stars {
+    font-size: 0.8rem;
+  }
+
+  .review-item .review-text {
+    font-size: 0.8rem;
+  }
+
+  .review-item .review-date {
+    font-size: 0.65rem;
+  }
+
+  .login-box {
+    padding: 1.5rem 1rem;
+  }
+
+  .login-box h1 {
+    font-size: 1.4rem;
+  }
+
+  .login-box input {
+    font-size: 0.9rem;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .date-navigation button {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .date-navigation #currentDateDisplay {
+    font-size: 0.7rem;
+    min-width: 60px;
+  }
+}
+
+/* ===== ТЕЛЕФОН В ИСТОРИИ ===== */
+.history-item .h-phone {
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ============================================
+   НОВАЯ ИСТОРИЯ - КАРТОЧКИ
+   ============================================ */
+
+/* ===== КАРТОЧКА ИСТОРИИ ===== */
+.history-item-new {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.6rem;
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.history-item-new:hover {
+  border-color: var(--accent);
+}
+
+/* ===== СТРОКА С КОЛОНКАМИ ===== */
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: nowrap;
+}
+
+/* ===== КОЛОНКИ ===== */
+.history-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.1rem;
+}
+
+/* ===== ДАТА (фиксированная) ===== */
+.history-col-date {
+  min-width: 110px;
+  max-width: 110px;
+  flex-shrink: 0;
+}
+
+.history-date {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.history-time {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ===== КЛИЕНТ (фиксированная) ===== */
+.history-col-client {
+  min-width: 160px;
+  max-width: 160px;
+  flex-shrink: 0;
+}
+
+.history-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-phone {
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+/* ===== УСЛУГИ (адаптивная) ===== */
+.history-col-services {
+  flex: 1;
+  min-width: 120px;
+}
+
+.history-services {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* ===== ЦЕНА (фиксированная) ===== */
+.history-col-price {
+  min-width: 110px;
+  max-width: 110px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.history-price {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ
+   ============================================ */
+@media (max-width: 768px) {
+  .history-row {
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  /* ===== ПЕРВАЯ СТРОКА: ДАТА (слева) + ИМЯ (справа) ===== */
+  .history-col-date {
+    min-width: 0;
+    max-width: none;
+    flex: 0 0 auto;
+    order: 1;
+  }
+
+  .history-col-client {
+    min-width: 0;
+    max-width: none;
+    flex: 1;
+    order: 2;
+    text-align: right;  /* ← ИМЯ ПРИЖИМАЕТСЯ К ПРАВОМУ КРАЮ */
+  }
+
+  .history-date {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .history-time {
+    font-size: 0.75rem;
+  }
+
+  .history-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .history-phone {
+    font-size: 0.75rem;
+    text-align: right;  /* ← ТЕЛЕФОН ПРИЖИМАЕТСЯ К ПРАВОМУ КРАЮ */
+  }
+
+  /* ===== ВТОРАЯ СТРОКА: УСЛУГИ (на всю ширину) ===== */
+  .history-col-services {
+    flex: 1 1 100%;
+    min-width: 0;
+    order: 3;
+    padding-top: 0.3rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .history-services {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  /* ===== ТРЕТЬЯ СТРОКА: ЦЕНА (справа) ===== */
+  .history-col-price {
+    min-width: 0;
+    max-width: none;
+    flex: 1 1 100%;
+    order: 4;
+    text-align: right;
+    padding-top: 0.2rem;
+  }
+
+  .history-price {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  /* Отступы */
+  .history-item-new {
+    padding: 0.5rem 0.7rem;
+  }
+}
+
+/* ===== ДЛЯ САМЫХ МАЛЕНЬКИХ ЭКРАНОВ ===== */
+@media (max-width: 480px) {
+  .history-date {
+    font-size: 0.75rem;
+  }
+
+  .history-time {
+    font-size: 0.65rem;
+  }
+
+  .history-name {
+    font-size: 0.8rem;
+  }
+
+  .history-phone {
+    font-size: 0.65rem;
+  }
+
+  .history-services {
+    font-size: 0.7rem;
+  }
+
+  .history-price {
+    font-size: 0.9rem;
+  }
+
+  .history-item-new {
+    padding: 0.4rem 0.5rem;
+  }
+}

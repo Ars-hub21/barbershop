@@ -3,9 +3,18 @@ const ReviewsPage = {
   selectedRating: 0,
 
   init: function() {
+    this.renderMasterOptions();
     this.renderReviews();
     this.initStarRating();
     this.initSubmit();
+  },
+
+  // Список мастеров в фильтре "Выберите мастера" — из js/data/masters.js,
+  // работает для любого количества мастеров (1-50).
+  renderMasterOptions: function() {
+    const select = document.getElementById('reviewMaster');
+    if (!select || typeof masters === 'undefined') return;
+    select.innerHTML = masters.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
   },
 
   formatDate: function(dateStr) {

@@ -197,16 +197,24 @@ const ContactsPage = {
     // Определяем имя барбера
     const masterName = this.getMasterName();
     
-    // Если включен режим автоподбора "Любой специалист", распределяем запись менее загруженному мастеру
-    const masterPromise = masterName 
+    // Если включен режим автоподбора "Любой специалист", распределяем запись
+    // самому свободному мастеру. Работает для ЛЮБОГО количества мастеров
+    // (1-50) — список берётся из js/data/masters.js, а не захардкожен.
+    const masterPromise = masterName
       ? Promise.resolve(masterName)
-      : Promise.all([
-          API.getFreeSlots('Дени', date, totalDuration),
-          API.getFreeSlots('Бауди', date, totalDuration)
-        ]).then(([deniData, baudiData]) => {
-          const deniSlots = (deniData && deniData.success) ? deniData.slots.length : 0;
-          const baudiSlots = (baudiData && baudiData.success) ? baudiData.slots.length : 0;
-          return baudiSlots > deniSlots ? 'Бауди' : 'Дени';
+      : Promise.all(
+          (typeof masters !== 'undefined' ? masters : []).map(m => API.getFreeSlots(m.name, date, totalDuration))
+        ).then(results => {
+          let bestMaster = null;
+          let bestCount = -1;
+          results.forEach((data, i) => {
+            const count = (data && data.success) ? data.slots.length : 0;
+            if (count > bestCount) {
+              bestCount = count;
+              bestMaster = masters[i].name;
+            }
+          });
+          return bestMaster;
         });
     
     masterPromise.then(finalMaster => {

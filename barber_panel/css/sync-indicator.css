@@ -1,0 +1,47 @@
+/* ============================================
+   barber_panel\css\sync-indicator.css ИНДИКАТОР СИНХРОНИЗАЦИИ
+   ============================================ */
+.sync-indicator {
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    cursor: help;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.sync-indicator:hover {
+    transform: scale(1.3);
+}
+
+@keyframes syncPulse {
+    0% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.15); }
+    100% { opacity: 0.4; transform: scale(0.9); }
+}
+
+.sync-synced {
+    color: var(--success);
+}
+
+.sync-syncing {
+    color: var(--accent);
+    animation: syncPulse 0.8s ease-in-out infinite;
+}
+
+.sync-error {
+    color: var(--danger);
+}
+
+.sync-pending {
+    color: var(--accent);
+    animation: syncPulse 1s ease-in-out infinite;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+    .sync-indicator {
+        font-size: 0.7rem;
+        margin-left: 0.3rem;
+    }
+}

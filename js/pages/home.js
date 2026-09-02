@@ -31,12 +31,12 @@ const Home = {
 
     // Рендерим разметку карточек с оберткой .master-card-info для мобильной адаптивности
     grid.innerHTML = masters.map(master => {
-      const masterKey = master.name === 'Дени' ? 'Deni' : (master.name === 'Бауди' ? 'Baudi' : master.id);
+      const masterKey = getMasterKey(master.name);
       
       return `
         <div class="master-card" data-id="${master.id}">
           <div class="master-photo">
-            <img src="img/${master.avatar || (master.name === 'Дени' ? 'Deni.png' : 'Baudi.png')}" alt="${master.name}" />
+            <img src="img/${master.avatar || 'placeholder-avatar.svg'}" alt="${master.name}" onerror="this.onerror=null;this.src='img/placeholder-avatar.svg';" />
           </div>
           <div class="master-card-info">
             <div class="master-name">${master.name}</div>
@@ -59,7 +59,7 @@ const Home = {
     API.getReviews().then(data => {
       if (data && data.success && Array.isArray(data.reviews)) {
         masters.forEach(master => {
-          const masterKey = master.name === 'Дени' ? 'Deni' : (master.name === 'Бауди' ? 'Baudi' : master.id);
+          const masterKey = getMasterKey(master.name);
           const ratingEl = document.getElementById(`rating${masterKey}`);
           if (!ratingEl) return;
 
@@ -88,7 +88,7 @@ const Home = {
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
     masters.forEach(master => {
-      const masterKey = master.name === 'Дени' ? 'Deni' : (master.name === 'Бауди' ? 'Baudi' : master.id);
+      const masterKey = getMasterKey(master.name);
       const slotsEl = document.getElementById(`slots${masterKey}`);
       if (!slotsEl) return;
 
