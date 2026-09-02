@@ -1965,7 +1965,12 @@ body::before {
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  /* Верхняя граница карточки ограничена (не 1fr), чтобы на широких экранах
+     карточка не растягивалась сильнее реального разрешения фото — иначе
+     фото выглядит мыльным/размытым. justify-content центрирует сетку,
+     когда карточки не заполняют всю ширину контейнера. */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 300px));
+  justify-content: center;
   gap: 1.2rem;
   padding-top: 1.5rem;
 }

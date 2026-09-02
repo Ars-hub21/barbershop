@@ -1,0 +1,316 @@
+/* ==========================================================================
+   barber_panel/gallery-tool/gallery-tool.css
+   ==========================================================================
+   Стили вкладки "Галерея" на странице Истории (history.html) — добавление
+   фото "до/после" с визуальным кадрированием (как загрузка аватарки в
+   Instagram) и конвертацией в WebP перед отправкой.
+
+   Файл самостоятельный — ничего не переопределяет и не трогает в
+   существующих стилях панели, только добавляет свои классы (префикс gt-).
+   ========================================================================== */
+
+/* ---------- Вкладки "История" / "Галерея" ---------- */
+.gt-tabs {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+
+.gt-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-weight: var(--btn-weight, 600);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.gt-tab-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-accent);
+}
+
+.gt-tab-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-primary);
+}
+
+/* ---------- Панель загрузки ---------- */
+.gt-panel-intro {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.gt-panel-intro code {
+  background: var(--bg-input, var(--bg-primary));
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  color: var(--accent);
+  font-size: 0.85rem;
+}
+
+.gt-upload-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.gt-upload-form .form-group {
+  margin-bottom: 0;
+}
+
+.gt-upload-form label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.gt-upload-form select,
+.gt-upload-form input[type="text"] {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-input, var(--bg-primary));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+}
+
+.gt-upload-form select:focus,
+.gt-upload-form input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.gt-file-row {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.gt-file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.1rem;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: var(--transition);
+}
+
+.gt-file-label:hover {
+  filter: brightness(1.08);
+}
+
+.gt-file-name {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+/* ---------- Список добавленного за сессию ---------- */
+.gt-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.gt-queue-empty {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.gt-queue-item {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.9rem;
+}
+
+.gt-queue-thumb {
+  width: 64px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.gt-queue-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.gt-queue-title {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.gt-queue-meta {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  margin-top: 0.15rem;
+}
+
+.gt-queue-status {
+  font-size: 0.78rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.gt-queue-status.sent { background: rgba(16, 185, 129, 0.15); color: var(--success, #10b981); }
+.gt-queue-status.pending { background: rgba(197, 160, 89, 0.15); color: var(--accent); }
+.gt-queue-status.error { background: rgba(239, 68, 68, 0.15); color: var(--danger, #ef4444); }
+
+.gt-status-line {
+  margin-top: 0.8rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.gt-status-line.gt-error { color: var(--danger, #ef4444); }
+.gt-status-line.gt-ok { color: var(--success, #10b981); }
+
+/* ---------- Модалка кадрирования (по типу загрузки аватарки в Instagram) ---------- */
+.gt-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+}
+
+/* Без этого правила атрибут [hidden] не срабатывает, т.к. класс .gt-modal-overlay
+   сам задаёт display:flex — а его display побеждает display:none из [hidden]
+   при равной специфичности (оба селектора — 0,1,0), т.к. это авторский CSS. */
+.gt-modal-overlay[hidden] {
+  display: none;
+}
+
+.gt-modal-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: var(--shadow-md);
+}
+
+.gt-modal-box h3 {
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  margin-bottom: 0.3rem;
+}
+
+.gt-modal-hint {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  margin-bottom: 0.9rem;
+}
+
+.gt-crop-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #000;
+  border: 1px solid var(--border-color);
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.gt-crop-viewport.gt-dragging {
+  cursor: grabbing;
+}
+
+.gt-crop-viewport img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.gt-crop-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.35) 1px, transparent 1px);
+  background-size: 33.33% 33.33%;
+  opacity: 0.6;
+}
+
+.gt-zoom-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 0.9rem;
+}
+
+.gt-zoom-row i {
+  color: var(--text-secondary);
+}
+
+.gt-zoom-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.gt-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+@media (max-width: 480px) {
+  .gt-tabs {
+    flex-direction: column;
+  }
+
+  .gt-upload-form {
+    grid-template-columns: 1fr;
+  }
+}
