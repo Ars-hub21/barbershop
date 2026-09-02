@@ -169,7 +169,7 @@ const ServicesPage = {
         const currentSelection = AppStorage.get('selectedServices', []);
         
         if (!currentSelection || currentSelection.length === 0) {
-          alert('⚠️ Пожалуйста, выберите хотя бы одну услугу из прайс-листа барбершопа.');
+          alert('⚠️ Пожалуйста, выберите хотя бы одну услугу из прайс-листа.');
           return;
         }
         window.location.href = 'Free-slots.html';

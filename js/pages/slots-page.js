@@ -96,7 +96,7 @@ const SlotsPage = {
     
     // Мгновенное извлечение слотов из пакетной памяти
     const slots = GlobalCache.getSlots(masterName, date, this.totalDuration);
-    this.renderSlots(date, masterName || 'Любой барбер', slots);
+    this.renderSlots(date, masterName || 'Любой мастер', slots);
   },
 
 // js/pages/slots-page.js - Бесконечный календарь с автодозагрузкой пакетов дней

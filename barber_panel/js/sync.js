@@ -320,7 +320,7 @@ createOrderCard: function(order) {
   // (../js/data/masters.js) — работает для 1-50 мастеров, а не только двух.
   renderAllOrders: function() {
     const containers = {};
-    (typeof masters !== 'undefined' ? masters : []).forEach(m => {
+    (typeof ALL_MASTERS !== 'undefined' ? ALL_MASTERS : []).forEach(m => {
       containers[m.name] = document.getElementById(`orders${m.key}`);
     });
 
@@ -339,7 +339,7 @@ createOrderCard: function(order) {
       console.log('🔄 renderAllBusySlots вызван, записей:', this.state.busySlots.length);
 
       const containers = {};
-      (typeof masters !== 'undefined' ? masters : []).forEach(m => {
+      (typeof ALL_MASTERS !== 'undefined' ? ALL_MASTERS : []).forEach(m => {
         containers[m.name] = document.getElementById(`orders${m.key}`);
       });
 

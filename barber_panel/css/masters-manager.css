@@ -30,6 +30,42 @@
   font-size: 0.85rem;
 }
 
+.gender-tabs {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.gender-tab-btn {
+  flex: 1 1 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-weight: var(--btn-weight, 600);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.gender-tab-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-accent);
+}
+
+.gender-tab-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-primary);
+}
+
 .masters-manager-list {
   display: flex;
   flex-direction: column;

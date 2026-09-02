@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   const BarberHistory = {
     init: function() {
-      const fallbackMaster = (typeof masters !== 'undefined' && masters[0]) ? masters[0].name : 'Дени';
+      const fallbackMaster = (typeof ALL_MASTERS !== 'undefined' && ALL_MASTERS[0]) ? ALL_MASTERS[0].name : 'Дени';
       let masterName = new URLSearchParams(window.location.search).get('master') || fallbackMaster;
       masterName = masterName.replace(/[▼▶]/g, '').trim();
       

@@ -27,6 +27,8 @@ const GalleryWidget = {
 
     const strips = new Array(this.STRIP_COUNT).fill('<div class="gallery-strip"></div>').join('');
 
+    const swipeIcon = (typeof SALON_THEME !== 'undefined' && SALON_THEME === 'feminine') ? 'fa-wand-magic-sparkles' : 'fa-cut';
+
     grid.innerHTML = galleryItems.map(function (item, idx) {
       return (
         '<div class="gallery-card" data-index="' + idx + '" tabindex="0" role="button" ' +
@@ -34,7 +36,7 @@ const GalleryWidget = {
           '<div class="gallery-photo">' +
             '<div class="gallery-after-layer" style="background-image:url(\'' + item.after + '\')"></div>' +
             '<div class="gallery-before-layer">' + strips + '</div>' +
-            '<span class="gallery-swipe"><i class="fas fa-cut"></i></span>' +
+            '<span class="gallery-swipe"><i class="fas ' + swipeIcon + '"></i></span>' +
             '<span class="gallery-badge gallery-badge-before">До</span>' +
             '<span class="gallery-badge gallery-badge-after">После</span>' +
           '</div>' +

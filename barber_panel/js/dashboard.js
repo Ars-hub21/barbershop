@@ -22,20 +22,23 @@ const Dashboard = {
     const grid = document.getElementById('dashboardGrid');
     if (!grid) return;
 
-    if (typeof masters === 'undefined' || !Array.isArray(masters) || masters.length === 0) {
+    // ВАЖНО: панель барберов всегда показывает мастеров ОБЕИХ версий сайта
+    // (ALL_MASTERS из ../js/data/masters.js) — переключатель мужская/женская
+    // на клиентском сайте не должен прятать от персонала часть записей.
+    if (typeof ALL_MASTERS === 'undefined' || !Array.isArray(ALL_MASTERS) || ALL_MASTERS.length === 0) {
       grid.innerHTML = '<p style="color:var(--text-secondary);padding:1rem;">Список мастеров пуст — добавьте мастера на странице "Мастера".</p>';
       return;
     }
 
     // При большом числе мастеров переключаем сетку в более компактный режим
     // (см. .dashboard-grid[data-density="compact"] в css/barber_styles.css)
-    if (masters.length > 4) {
+    if (ALL_MASTERS.length > 4) {
       grid.setAttribute('data-density', 'compact');
     } else {
       grid.removeAttribute('data-density');
     }
 
-    grid.innerHTML = masters.map(m => `
+    grid.innerHTML = ALL_MASTERS.map(m => `
       <div class="master-column" data-master="${m.name}">
         <div class="column-header" id="header${m.key}">
           <div class="master-avatar">
@@ -95,8 +98,8 @@ const Dashboard = {
   // ===== ПОЛНАЯ ПЕРЕЗАГРУЗКА ДНЯ =====
   // ВАЖНО: сбрасывает локальное состояние и загружает свежие данные
   reloadDay: function() {
-    // 1. Очищаем контейнеры (для каждого мастера из ../js/data/masters.js)
-    (typeof masters !== 'undefined' ? masters : []).forEach(m => {
+    // 1. Очищаем контейнеры (для каждого мастера из ALL_MASTERS — ../js/data/masters.js)
+    (typeof ALL_MASTERS !== 'undefined' ? ALL_MASTERS : []).forEach(m => {
       const el = document.getElementById(`orders${m.key}`);
       if (el) el.innerHTML = '';
     });

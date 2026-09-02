@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Работает для любого количества мастеров (1-50), а не только двух.
     renderMasterFilterOptions: function() {
       const select = document.getElementById('filterMaster');
-      if (!select || typeof masters === 'undefined') return;
-      const options = masters.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+      if (!select || typeof ALL_MASTERS === 'undefined') return;
+      const options = ALL_MASTERS.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
       select.innerHTML = '<option value="all">Все</option>' + options;
     },
 
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const stats = document.getElementById('reviewsStats');
       // Список имён мастеров из ../js/data/masters.js — работает для
       // любого количества мастеров (1-50), а не только двух захардкоженных.
-      const masterNames = (typeof masters !== 'undefined' ? masters : []).map(m => m.name);
+      const masterNames = (typeof ALL_MASTERS !== 'undefined' ? ALL_MASTERS : []).map(m => m.name);
       let statsHtml = '<div class="history-stats">';
       masterNames.forEach(m => {
         const mReviews = allReviews.filter(r => r.masterName === m);

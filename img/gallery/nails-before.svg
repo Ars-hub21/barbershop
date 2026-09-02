@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <rect width="400" height="300" fill="#2a262a"/>
+  <rect width="400" height="300" fill="url(#noise)" opacity="0.06"/>
+  <defs>
+    <pattern id="noise" width="6" height="6" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#000"/>
+      <circle cx="1" cy="1" r="0.6" fill="#fff"/>
+    </pattern>
+  </defs>
+
+  <!-- Силуэт: кисть руки с необработанными ногтями (плейсхолдер "ДО") -->
+  <g fill="#c99e82" stroke="#8a6a56" stroke-width="1.5">
+    <!-- ладонь -->
+    <rect x="158" y="150" width="94" height="88" rx="32"/>
+    <!-- большой палец -->
+    <rect x="118" y="150" width="34" height="70" rx="16" transform="rotate(-28 135 185)"/>
+    <!-- пальцы -->
+    <rect x="167" y="92" width="20" height="80" rx="10"/>
+    <rect x="192" y="72" width="20" height="100" rx="10"/>
+    <rect x="217" y="82" width="20" height="90" rx="10"/>
+    <rect x="242" y="100" width="20" height="72" rx="10"/>
+  </g>
+
+  <!-- необработанные ногти: тон в тон с кожей, неровный край -->
+  <g fill="#b78d70" stroke="#8a6a56" stroke-width="1">
+    <ellipse cx="177" cy="98" rx="8" ry="9"/>
+    <ellipse cx="202" cy="78" rx="8" ry="9"/>
+    <ellipse cx="227" cy="88" rx="8" ry="9"/>
+    <ellipse cx="252" cy="106" rx="7.5" ry="8.5"/>
+  </g>
+
+  <text x="200" y="272" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#8a8390" letter-spacing="1">
+    ПЛЕЙСХОЛДЕР — ЗАМЕНИТЕ НА РЕАЛЬНОЕ ФОТО
+  </text>
+</svg>

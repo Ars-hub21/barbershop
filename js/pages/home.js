@@ -40,7 +40,7 @@ const Home = {
           </div>
           <div class="master-card-info">
             <div class="master-name">${master.name}</div>
-            <div class="master-title">${master.title || 'Барбер'}</div>
+            <div class="master-title">${master.title || (typeof BRAND !== 'undefined' && BRAND.roleLabel) || 'Барбер'}</div>
             <div class="master-rating" id="rating${masterKey}">⏳ Загрузка...</div>
             <div class="master-slots" id="slots${masterKey}"></div>
           </div>
