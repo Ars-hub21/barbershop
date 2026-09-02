@@ -4,6 +4,33 @@
 // - Инициализацию всех компонентов
 // - Двойной клик/тап для заказов И занятости (общий обработчик)
 
+// ==========================================================================
+// ПАРОЛЬ ВХОДА В ПАНЕЛЬ БАРБЕРОВ
+// ==========================================================================
+// Сайт статический (без сервера), поэтому пароль хранится не текстом, а в
+// виде SHA-256 хэша — так посетитель, открывший исходный код страницы, не
+// увидит сам пароль напрямую. Это не полноценная серверная защита (файл
+// всё равно лежит в открытом репозитории на GitHub), но она надёжно
+// закрывает панель от случайных клиентов и подбора "на глаз".
+//
+// КАК СМЕНИТЬ ПАРОЛЬ:
+// 1) Откройте консоль браузера (клавиша F12 → вкладка Console) на любой странице.
+// 2) Вставьте и выполните (замените НОВЫЙ_ПАРОЛЬ на свой):
+//      crypto.subtle.digest('SHA-256', new TextEncoder().encode('НОВЫЙ_ПАРОЛЬ'))
+//        .then(b => console.log(Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2,'0')).join('')))
+// 3) Скопируйте результат (строка из 64 символов) и вставьте его вместо
+//    значения PANEL_PASSWORD_HASH ниже.
+//
+// Текущий пароль (сообщите только тем, кому доверяете вход в панель):
+//   UrusMartan_Panel-2026!
+const PANEL_PASSWORD_HASH = 'a6faff5e400fa33056395137343a28918deb4a09bd3894182ae41b3b9c021b68';
+
+async function sha256Hex(text) {
+    const bytes = new TextEncoder().encode(text);
+    const digest = await crypto.subtle.digest('SHA-256', bytes);
+    return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 function isMobileDevice() {
     return /Android|iPhone|iPad|iPod|BlackBerry|Opera Mini|IEMobile/i.test(navigator.userAgent);
 }
@@ -16,15 +43,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===== ВХОД =====
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
+        loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
             const password = document.getElementById('passwordInput').value;
-            if (password === 'parol') {
+
+            if (submitBtn) submitBtn.disabled = true;
+            let hash;
+            try {
+                hash = await sha256Hex(password);
+            } catch (err) {
+                // crypto.subtle недоступен (например, страница открыта не по HTTPS/localhost)
+                console.error('Не удалось проверить пароль:', err);
+                document.getElementById('loginError').textContent = 'Ошибка проверки пароля. Откройте сайт по https-ссылке.';
+                if (submitBtn) submitBtn.disabled = false;
+                return;
+            }
+
+            if (hash === PANEL_PASSWORD_HASH) {
                 localStorage.setItem('deviceAuthorized', 'true');
                 window.location.href = 'dashboard.html';
             } else {
                 document.getElementById('loginError').textContent = 'Неверный пароль. Попробуйте снова.';
                 document.getElementById('passwordInput').value = '';
+                if (submitBtn) submitBtn.disabled = false;
             }
         });
         return;
