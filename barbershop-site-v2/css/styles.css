@@ -1,0 +1,2134 @@
+/* ==========================================================================
+   frontend\styles.css # Клиентские стили барбершопа
+   ЧАСТЬ 1: Глобальные переменные, сброс, Базовые элементы и Хедер
+   ========================================================================== */
+
+@import url('https://googleapis.com');
+
+/* ВНИМАНИЕ: цветовые переменные темы (--bg-primary, --accent, --font-body
+   и т.д.) больше не объявляются здесь — они переехали в css/theme.css,
+   где есть мужской и женский набор палитр. Этот файл только использует
+   var(...) и не должен переопределять :root, иначе поломает переключение
+   тем. Если чего-то не хватает — добавляйте переменную в theme.css. */
+
+/* ==========================================================================
+   Сброс стилей (Reset)
+   ========================================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Кастомный скроллбар в стиле барбершопа */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Едва заметный фоновый паттерн/шум для текстурности */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 0);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ==========================================================================
+   Хедер (Шапка виджета)
+   ========================================================================== */
+.header {
+  background: var(--bg-secondary);
+  padding: 1.2rem 0;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  z-index: 10;
+}
+
+.header-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.address {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: var(--heading-transform);
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.address i {
+  color: var(--accent);
+  font-size: 1.1rem;
+  filter: drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.3));
+}
+
+.map-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: var(--heading-transform);
+  letter-spacing: 1.5px;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius);
+  background: rgba(var(--accent-rgb), 0.02);
+  transition: var(--transition);
+}
+
+.map-link:hover {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-glow);
+}
+/* ==========================================================================
+   frontend\styles.css # Клиентские стили барбершопа
+   ЧАСТЬ 2: Заголовки, Карточки мастеров, Переключатель и Кнопки
+   ========================================================================== */
+
+/* ==========================================================================
+   Заголовки шагов
+   ========================================================================== */
+.step-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-transform: var(--heading-transform);
+  letter-spacing: 2px;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+  border-left: 3px solid var(--accent);
+  padding-left: 1.2rem;
+  position: relative;
+}
+
+/* ==========================================================================
+   Карточки мастеров (Шаг 1)
+   ========================================================================== */
+.masters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.master-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem 1.5rem;
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Элегантная фоновая подсветка при наведении */
+.master-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(var(--accent-rgb), 0.08), transparent 70%);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.master-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+.master-card:hover::after {
+  opacity: 1;
+}
+
+.master-card.selected {
+  border-color: var(--accent);
+  background: #1b1e26; /* Слегка светлее в выбранном состоянии */
+  box-shadow: var(--shadow-glow);
+}
+
+/* Фото мастера */
+.master-photo, .master-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  margin: 0 auto 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 2px solid var(--border-accent);
+  background: var(--bg-secondary);
+  transition: var(--transition);
+  position: relative;
+  z-index: 2;
+}
+
+.master-card:hover .master-photo,
+.master-card:hover .master-avatar,
+.master-card.selected .master-photo,
+.master-card.selected .master-avatar {
+  border-color: var(--accent);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+}
+
+.master-photo img, .master-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.master-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.2rem;
+  color: var(--text-primary);
+}
+
+.master-title {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-transform: var(--heading-transform);
+  letter-spacing: 1px;
+  font-weight: 500;
+  margin-bottom: 0.6rem;
+}
+
+/* Рейтинг */
+.master-rating {
+  color: var(--star-active);
+  margin-bottom: 1.2rem;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.master-rating .star-empty {
+  color: var(--star-inactive);
+}
+
+.master-rating .rating-count {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-left: 0.4rem;
+  font-weight: 600;
+}
+
+/* Мини-слоты на карточке */
+.master-slots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.master-slots .slot-time {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.master-card:hover .slot-time {
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.master-slots .slot-time.no-slots {
+  background: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.15);
+  color: #ffa4a4;
+  font-size: 0.75rem;
+  width: 100%;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* ==========================================================================
+   Переключатель "Любой специалист"
+   ========================================================================== */
+.any-master-toggle {
+  background: var(--bg-card);
+  padding: 1.2rem 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: var(--heading-transform);
+  letter-spacing: 0.5px;
+}
+
+/* Кастомный чекбокс */
+.toggle-label input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--text-muted);
+  border-radius: var(--radius);
+  outline: none;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+
+.toggle-label input[type="checkbox"]:checked {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.toggle-label input[type="checkbox"]:checked::before {
+  content: '✓';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--bg-primary);
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.toggle-note {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.selected-master-info {
+  display: none;
+  background: rgba(var(--accent-rgb), 0.05);
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: var(--heading-transform);
+  letter-spacing: 1px;
+  color: var(--accent);
+  border: 1px solid var(--border-accent);
+}
+
+.selected-master-info.visible {
+  display: block;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+/* ==========================================================================
+   Кнопки навигации
+   ========================================================================== */
+.navigation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.reviews-link-wrapper {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.btn {
+  position: relative; /* якорь для ножниц-лоадера (js/utils/scissors-loader.js) */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 2.2rem;
+  border-radius: var(--radius);
+  font-weight: var(--btn-weight);
+  text-transform: var(--btn-transform);
+  letter-spacing: var(--btn-tracking);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-card);
+  border-color: var(--text-muted);
+}
+
+.btn-accent {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--border-accent);
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--bg-primary);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-danger {
+  background: rgba(239, 64, 64, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(239, 64, 64, 0.2);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btn-sm {
+  padding: 0.5rem 1.2rem;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
+
+.btn-large {
+  padding: 1.1rem 3rem;
+  font-size: 0.95rem;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* ==========================================================================
+   frontend\styles.css # Клиентские стили барбершопа
+   ЧАСТЬ 3: Календарь, Слоты времени, Индикаторы загрузки (Шаг 2)
+   ========================================================================== */
+
+/* ==========================================================================
+   Календарь (Шаг 2)
+   ========================================================================== */
+.calendar-wrapper {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.calendar-header button {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  transition: var(--transition);
+  border-radius: var(--radius);
+}
+
+.calendar-header button:hover {
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+#calendarMonthYear {
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-transform: var(--heading-transform);
+  letter-spacing: 1.5px;
+  color: var(--text-primary);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.calendar-grid .day-name {
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: var(--heading-transform);
+  letter-spacing: 1px;
+  padding: 0.5rem 0;
+}
+
+.calendar-grid .day-cell {
+  text-align: center;
+  padding: 0.8rem 0;
+  background: var(--bg-secondary);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Эффекты при наведении на кликабельные дни */
+.calendar-grid .day-cell:hover:not(.unavailable):not(.empty) {
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+/* Дни, доступные для записи */
+.calendar-grid .day-cell.available {
+  background: rgba(16, 185, 129, 0.04);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  color: #a7f3d0;
+}
+
+.calendar-grid .day-cell.available:hover {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: var(--success);
+}
+
+/* Недоступные дни */
+.calendar-grid .day-cell.unavailable {
+  background: transparent;
+  color: var(--text-muted);
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Выбранный день */
+.calendar-grid .day-cell.selected {
+  background: var(--accent) !important;
+  color: var(--bg-primary) !important;
+  border-color: var(--accent) !important;
+  font-weight: 800;
+  box-shadow: var(--shadow-glow);
+}
+
+.calendar-grid .day-cell.empty {
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+/* ==========================================================================
+   Слоты времени (Шаг 2)
+   ========================================================================== */
+.slots-container {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+  min-height: 100px;
+}
+
+.slots-placeholder {
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 2rem 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.slot-group {
+  margin-bottom: 1.2rem;
+}
+
+.slot-group:last-child {
+  margin-bottom: 0;
+}
+
+.slot-group h4 {
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: var(--heading-transform);
+  letter-spacing: 1px;
+}
+
+.slot-group .slots-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.slot-group .slots-list button {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+
+.slot-group .slots-list button:hover:not(.disabled):not(.selected) {
+  background: var(--bg-input);
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.slot-group .slots-list button.selected {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-color: var(--accent);
+  font-weight: 700;
+  box-shadow: var(--shadow-glow);
+}
+
+.slot-group .slots-list button.disabled {
+  background: transparent;
+  border-color: var(--border-color);
+  color: var(--text-muted);
+  opacity: 0.3;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+/* Ошибка: нет свободных слотов */
+.no-slots-message {
+  background: rgba(239, 68, 68, 0.04);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.no-slots-message p {
+  color: #fca5a5;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   Индикатор загрузки слотов (Loader)
+   ========================================================================== */
+.slots-loading {
+  text-align: center;
+  padding: 2.5rem 0;
+}
+
+.slots-loading p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-top: 1.2rem;
+  letter-spacing: 0.5px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(255, 255, 255, 0.03);
+  border-top: 3px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.05);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* ==========================================================================
+   frontend\styles.css # Клиентские стили барбершопа
+   ЧАСТЬ 4: Табы, Карточки услуг и Итоговый блок стоимости (Шаг 3)
+   ========================================================================== */
+
+/* ==========================================================================
+   Переключатели категорий (Вкладки / Табы)
+   ========================================================================== */
+.tabs {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: var(--heading-transform);
+  letter-spacing: 1px;
+  transition: var(--transition);
+}
+
+.tab-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.tab-btn.active {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-glow);
+}
+
+/* ==========================================================================
+   Контейнер и Карточки услуг (Шаг 3)
+   ========================================================================== */
+.services-container {
+  display: grid;
+  /* Современная адаптивная сетка без жестких медиа-запросов */
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.service-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.service-card:hover {
+  border-color: var(--text-muted);
+  background: var(--bg-input);
+  transform: translateY(-2px);
+}
+
+/* Состояние когда услуга выбрана */
+.service-card.selected {
+  border-color: var(--accent);
+  background: #1b1e26;
+  box-shadow: var(--shadow-glow);
+}
+
+.service-card .service-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+/* Стилизация чекбокса внутри услуги */
+.service-card input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--text-muted);
+  border-radius: var(--radius);
+  outline: none;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+  pointer-events: none; /* Клик обрабатывается всей карточкой */
+}
+
+.service-card.selected input[type="checkbox"] {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.service-card.selected input[type="checkbox"]::before {
+  content: '✓';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--bg-primary);
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.service-card .service-info {
+  flex: 1;
+}
+
+.service-card .service-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-bottom: 0.2rem;
+}
+
+.service-card .service-desc {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin-bottom: 0.8rem;
+}
+
+/* Мета-информация: Время выполнения и Стоимость */
+.service-card .service-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  margin-top: auto;
+}
+
+.service-card .service-price {
+  color: var(--accent);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.service-card:hover .service-meta {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ==========================================================================
+   Плашка итоговой сводки (Summary block)
+   ========================================================================== */
+.summary-block {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-accent);
+  background: linear-gradient(90deg, var(--bg-card), rgba(var(--accent-rgb), 0.02));
+}
+
+.summary-block p {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: var(--heading-transform);
+  letter-spacing: 0.5px;
+}
+
+.summary-block span {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--accent);
+  text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.2);
+}
+/* ==========================================================================
+   frontend\styles.css # Клиентские стили барбершопа
+   ЧАСТЬ 5: Сводка заказа, Форма данных клиента и Инпуты (Шаг 4)
+   ========================================================================= */
+
+/* ==========================================================================
+   Сводка деталей заказа (Order summary)
+   ========================================================================== */
+.order-summary {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+}
+
+.order-summary .detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.95rem;
+}
+
+.order-summary .detail-row:last-child {
+  border-bottom: none;
+}
+
+.order-summary .detail-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.order-summary .detail-value {
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* Выделение итоговой стоимости в деталях */
+.order-summary .detail-row:last-child .detail-value {
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   Форма данных клиента (Client Form)
+   ========================================================================== */
+.client-form {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+}
+
+/* Центрирование главной кнопки отправки в форме */
+.client-form .btn-primary {
+  display: flex;
+  margin: 1.5rem auto 0;
+  min-width: 240px;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group:last-of-type {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: var(--heading-transform);
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+}
+
+/* Маркер обязательного поля */
+.form-group .required {
+  color: var(--danger);
+  margin-left: 0.2rem;
+}
+
+/* Поля ввода и текстовые области */
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg-secondary);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.08);
+}
+
+/* Стилизация плейсхолдеров */
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* ==========================================================================
+   Блок чекбоксов согласий (Consents)
+   ========================================================================== */
+.consents {
+  margin: 1.5rem 0 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  user-select: none;
+}
+
+.checkbox-label:hover {
+  color: var(--text-primary);
+}
+
+/* Кастомный вид чекбоксов согласия */
+.checkbox-label input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--text-muted);
+  border-radius: var(--radius);
+  outline: none;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.checkbox-label input[type="checkbox"]:checked {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.checkbox-label input[type="checkbox"]:checked::before {
+  content: '✓';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--bg-primary);
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+/* ==========================================================================
+   frontend\styles.css # Клиентские стили барбершопа
+   ЧАСТЬ 6: Экран успеха и детали подтвержденного визита (Шаг 5)
+   ========================================================================= */
+
+/* ==========================================================================
+   Экран успеха (Success Page)
+   ========================================================================== */
+.success-page {
+  text-align: center;
+  padding: 2rem 1rem;
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Элегантный анимированный маркер успеха */
+.success-icon {
+  font-size: 4rem;
+  color: var(--success);
+  margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 90px;
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 50%;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.1);
+  animation: scaleUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Номер бронирования / заказа */
+.order-number {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  margin-bottom: 2rem;
+  text-transform: var(--heading-transform);
+  text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.15);
+}
+
+/* Детализация брони в стиле чека (квитанции) */
+.order-details {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  text-align: left;
+  max-width: 520px;
+  margin: 0 auto 2.5rem;
+  position: relative;
+}
+
+/* Имитация линии отрыва на квитанции барбершопа (сверху и снизу) */
+.order-details::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: -1px;
+  height: 2px;
+  background-image: linear-gradient(to right, var(--bg-primary) 4px, transparent 4px);
+  background-size: 8px 2px;
+}
+
+.order-details .detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  font-size: 0.95rem;
+}
+
+.order-details .detail-row:last-child {
+  border-bottom: none;
+  padding-top: 1rem;
+  margin-top: 0.2rem;
+  border-top: 1px dashed var(--border-color);
+}
+
+.order-details .detail-row .detail-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.order-details .detail-row .detail-value {
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* Акцент на финальную стоимость в чеке */
+.order-details .detail-row:last-child .detail-value {
+  color: var(--accent);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+/* Анимации для появления элементов */
+@keyframes scaleUp {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* ==========================================================================
+   frontend\styles.css # Клиентские стили барбершопа
+   ЧАСТЬ 7: Оформление модуля отзывов (reviews.html)
+   ========================================================================= */
+
+.reviews-container {
+  max-width: 800px;
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+/* ==========================================================================
+   Форма нового отзыва (Review Form)
+   ========================================================================== */
+.review-form {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.review-form .form-group {
+  margin-bottom: 1.2rem;
+}
+
+/* Премиальный селектор выбора мастера */
+.review-form .form-group select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+  appearance: none; /* Убираем дефолтную стрелку */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://w3.org' width='12' height='12' fill='%23c5a059' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/\3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 1.2rem) center;
+}
+
+.review-form .form-group select:focus {
+  border-color: var(--accent);
+  background-color: var(--bg-secondary);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.08);
+}
+
+/* Звездный интерактивный рейтинг */
+.review-form .star-rating {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 2.2rem;
+  cursor: pointer;
+  user-select: none;
+  margin-top: 0.2rem;
+}
+
+.review-form .star-rating .star {
+  color: var(--star-inactive);
+  transition: var(--transition);
+}
+
+.review-form .star-rating .star.active {
+  color: var(--star-active);
+  filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.4));
+}
+
+.review-form .star-rating .star:hover {
+  transform: scale(1.15);
+  color: var(--accent-light);
+}
+
+/* ==========================================================================
+   Элементы ленты отзывов (Reviews List & Items)
+   ========================================================================== */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.review-item {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.review-item:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Верхняя линия карточки отзыва: Клиент + Барбер */
+.review-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.review-client-info {
+  flex-shrink: 0;
+}
+
+.review-client-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+.review-master {
+  flex-shrink: 0;
+  background: rgba(var(--accent-rgb), 0.06);
+  border: 1px solid rgba(var(--accent-rgb), 0.15);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius);
+}
+
+.review-master-name {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: var(--heading-transform);
+  letter-spacing: 0.8px;
+  color: var(--accent);
+}
+
+/* Нижняя строка мета-данных: Дата публикации + Набранные звезды */
+.review-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.review-client-date {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.review-stars {
+  color: var(--star-active);
+  font-size: 0.95rem;
+  display: flex;
+  gap: 0.1rem;
+}
+
+.review-stars .star-empty {
+  color: var(--star-inactive);
+}
+
+/* Финальный блок текста самого отзыва */
+.review-text {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  word-break: break-word;
+  white-space: pre-wrap;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.review-item:hover .review-text {
+  color: var(--text-primary);
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+/* ==========================================================================
+   frontend\styles.css # Клиентские стили барбершопа
+   ЧАСТЬ 7: Оформление модуля отзывов (reviews.html)
+   ========================================================================= */
+
+.reviews-container {
+  max-width: 800px;
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+/* ==========================================================================
+   Форма нового отзыва (Review Form)
+   ========================================================================== */
+.review-form {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.review-form .form-group {
+  margin-bottom: 1.2rem;
+}
+
+/* Премиальный селектор выбора мастера */
+.review-form .form-group select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+  appearance: none; /* Убираем дефолтную стрелку */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://w3.org' width='12' height='12' fill='%23c5a059' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/\3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 1.2rem) center;
+}
+
+.review-form .form-group select:focus {
+  border-color: var(--accent);
+  background-color: var(--bg-secondary);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.08);
+}
+
+/* Звездный интерактивный рейтинг */
+.review-form .star-rating {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 2.2rem;
+  cursor: pointer;
+  user-select: none;
+  margin-top: 0.2rem;
+}
+
+.review-form .star-rating .star {
+  color: var(--star-inactive);
+  transition: var(--transition);
+}
+
+.review-form .star-rating .star.active {
+  color: var(--star-active);
+  filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.4));
+}
+
+.review-form .star-rating .star:hover {
+  transform: scale(1.15);
+  color: var(--accent-light);
+}
+
+/* ==========================================================================
+   Элементы ленты отзывов (Reviews List & Items)
+   ========================================================================== */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.review-item {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.review-item:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Верхняя линия карточки отзыва: Клиент + Барбер */
+.review-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.review-client-info {
+  flex-shrink: 0;
+}
+
+.review-client-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+.review-master {
+  flex-shrink: 0;
+  background: rgba(var(--accent-rgb), 0.06);
+  border: 1px solid rgba(var(--accent-rgb), 0.15);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius);
+}
+
+.review-master-name {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: var(--heading-transform);
+  letter-spacing: 0.8px;
+  color: var(--accent);
+}
+
+/* Нижняя строка мета-данных: Дата публикации + Набранные звезды */
+.review-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.review-client-date {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.review-stars {
+  color: var(--star-active);
+  font-size: 0.95rem;
+  display: flex;
+  gap: 0.1rem;
+}
+
+.review-stars .star-empty {
+  color: var(--star-inactive);
+}
+
+/* Финальный блок текста самого отзыва */
+.review-text {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  word-break: break-word;
+  white-space: pre-wrap;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.review-item:hover .review-text {
+  color: var(--text-primary);
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+/* ==========================================================================
+   frontend\styles.css # Клиентские стили барбершопа
+   ЧАСТЬ 8: Адаптивность и оптимизация интерфейса под мобильные устройства
+   ========================================================================= */
+
+/* ==========================================================================
+   Планшеты и мобильные устройства (до 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 0.8rem;
+    text-align: center;
+  }
+
+  .address {
+    font-size: 0.85rem;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .step-title {
+    font-size: 1.2rem;
+    padding-left: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Сетка мастеров в 2 колонки */
+  .masters-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .master-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .master-photo, .master-avatar {
+    width: 76px;
+    height: 76px;
+  }
+
+  .master-name {
+    font-size: 1.1rem;
+  }
+
+  /* Календарная сетка */
+  .calendar-wrapper {
+    padding: 1rem;
+  }
+
+  .calendar-grid {
+    gap: 0.35rem;
+  }
+
+  .calendar-grid .day-cell {
+    padding: 0.6rem 0;
+    font-size: 0.8rem;
+  }
+
+  .slots-container {
+    padding: 1rem;
+  }
+
+  /* Кнопки навигации во всю ширину */
+  .navigation-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.8rem;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 1rem 1.5rem;
+  }
+
+  .summary-block {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.2rem;
+  }
+
+  /* Элементы сводки и чеков */
+  .order-summary .detail-row,
+  .order-details .detail-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.6rem 0;
+    text-align: center;
+  }
+
+  .order-summary .detail-value,
+  .order-details .detail-value {
+    text-align: center;
+  }
+
+  /* Адаптация отзывов */
+  .review-form {
+    padding: 1.5rem;
+  }
+
+  .review-top-row,
+  .review-bottom-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.4rem;
+  }
+
+  .review-text {
+    text-align: center;
+    font-size: 0.9rem;
+  }
+}
+
+/* ==========================================================================
+   Маленькие смартфоны (до 480px)
+   ========================================================================== */
+@media (max-width: 480px) {
+  .masters-grid {
+    grid-template-columns: 1fr; /* На совсем маленьких экранах мастера в одну строку для читаемости */
+    gap: 0.8rem;
+  }
+
+  .master-card {
+    padding: 1.2rem;
+    display: flex;
+    align-items: center;
+    text-align: left;
+    gap: 1rem;
+  }
+
+  .master-card::after {
+    background: radial-gradient(circle at 0% 50%, rgba(var(--accent-rgb), 0.08), transparent 70%);
+  }
+
+  .master-photo, .master-avatar {
+    margin: 0;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+  }
+
+  .master-card-info {
+    flex: 1;
+  }
+
+  .master-name {
+    font-size: 1.05rem;
+  }
+
+  .master-title {
+    font-size: 0.75rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .master-rating {
+    justify-content: flex-start;
+    margin-bottom: 0.5rem;
+  }
+
+  .master-slots {
+    justify-content: flex-start;
+    margin-top: 0.4rem;
+  }
+
+  /* Настройки календаря на смартфонах */
+  #calendarMonthYear {
+    font-size: 0.95rem;
+  }
+
+  .calendar-header button {
+    font-size: 1rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .calendar-grid .day-name {
+    font-size: 0.7rem;
+    letter-spacing: 0;
+  }
+
+  .calendar-grid .day-cell {
+    font-size: 0.75rem;
+    padding: 0.5rem 0;
+  }
+
+  /* Слоты времени */
+  .slot-group .slots-list {
+    gap: 0.4rem;
+  }
+
+  .slot-group .slots-list button {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    flex: 1 1 calc(50% - 0.2rem); /* Распределяем аккуратно по два слота в ряд */
+    text-align: center;
+  }
+
+  /* Табы категорий */
+  .tabs {
+    gap: 0.4rem;
+  }
+
+  .tab-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    flex: 1 1 calc(50% - 0.2rem);
+    text-align: center;
+  }
+
+  /* Карточки услуг */
+  .service-card {
+    padding: 1rem;
+  }
+
+  .service-card .service-name {
+    font-size: 0.95rem;
+  }
+
+  .service-card .service-desc {
+    font-size: 0.75rem;
+  }
+
+  /* Формы ввода */
+  .form-group label {
+    font-size: 0.75rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    font-size: 0.9rem;
+    padding: 0.7rem 0.9rem;
+  }
+
+  .checkbox-label {
+    font-size: 0.8rem;
+  }
+
+  /* Модуль отзывов */
+  .review-form .star-rating {
+    font-size: 1.8rem;
+    justify-content: center;
+  }
+
+  .review-item {
+    padding: 1rem;
+  }
+}
+/* ==========================================================================
+   frontend\styles.css # Клиентские стили барбершопа
+   ЧАСТЬ 9: Тэглайн бренда (короткий слоган под шапкой на главной)
+   ========================================================================== */
+.brand-tagline {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.9rem 1.5rem 0;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-style: var(--tagline-style);
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  text-align: center;
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .brand-tagline {
+    padding-top: 0.7rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* ==========================================================================
+   frontend\styles.css # Клиентские стили барбершопа
+   ЧАСТЬ 10: Кнопка-«ножницы» (универсальный индикатор загрузки)
+   Логика — в js/utils/scissors-loader.js. Работает на любой .btn:
+   ScissorsLoader.start(button) / ScissorsLoader.stop(button).
+   ========================================================================== */
+.btn-cutting {
+  cursor: not-allowed;
+}
+
+.btn-cutting-text {
+  position: relative;
+  z-index: 1;
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+
+/* Контейнер ножниц: ширина 46px, наполовину выходит за левый край кнопки
+   на старте и наполовину за правый край на финише (см. расчёт в JS) */
+.btn-scissors {
+  position: absolute;
+  top: 50%;
+  left: -23px;
+  width: 46px;
+  height: 46px;
+  transform: translateY(-50%);
+  color: var(--accent);
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+
+.sl-part-left,
+.sl-part-right {
+  transform-origin: 45px 50px;
+}
+
+.btn-cutting .sl-part-left {
+  animation: sl-cut-left 0.15s infinite ease-in-out alternate;
+}
+
+.btn-cutting .sl-part-right {
+  animation: sl-cut-right 0.15s infinite ease-in-out alternate;
+}
+
+@keyframes sl-cut-left {
+  0% { transform: rotate(5deg); }
+  100% { transform: rotate(-15deg); }
+}
+
+@keyframes sl-cut-right {
+  0% { transform: rotate(-5deg); }
+  100% { transform: rotate(15deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-cutting .sl-part-left,
+  .btn-cutting .sl-part-right {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   frontend\styles.css # Клиентские стили барбершопа
+   ЧАСТЬ 11: Галерея работ «До / После» (второстепенный блок на главной)
+   Свёрнута по умолчанию — раскрывается по клику на .gallery-toggle.
+   Разметка и логика — в index.html + js/pages/gallery-widget.js.
+   ========================================================================== */
+.gallery-widget {
+  margin-top: 2.5rem;
+}
+
+.gallery-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 1rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-accent);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: var(--btn-transform);
+  letter-spacing: var(--btn-tracking);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.gallery-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--bg-input);
+}
+
+.gallery-toggle i:first-child {
+  color: var(--accent);
+}
+
+.gallery-toggle-icon {
+  margin-left: 0.3rem;
+  transition: transform 0.3s ease;
+}
+
+.gallery-toggle.is-open .gallery-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.gallery-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.45s ease, opacity 0.35s ease;
+}
+
+.gallery-panel.open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.gallery-panel > .gallery-panel-inner {
+  overflow: hidden;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
+  padding-top: 1.5rem;
+}
+
+.gallery-note {
+  grid-column: 1 / -1;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  text-align: center;
+  padding-top: 0.4rem;
+}
+
+.gallery-card {
+  cursor: pointer;
+  user-select: none;
+}
+
+.gallery-photo {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  background: var(--bg-card);
+  transform: rotate(var(--gallery-frame-rotate));
+  transition: var(--transition);
+}
+
+.gallery-card:hover .gallery-photo {
+  transform: rotate(0deg) translateY(-3px);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  border-color: var(--border-accent);
+}
+
+.gallery-after-layer {
+  position: absolute;
+  inset: 0;
+  background-color: var(--bg-secondary);
+  background-size: cover;
+  background-position: center;
+}
+
+.gallery-before-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+
+.gallery-strip {
+  position: relative;
+  width: calc(100% / 6);
+  height: 100%;
+  flex-shrink: 0;
+  background-color: var(--bg-card);
+  background-size: 600% 100%;
+  background-repeat: no-repeat;
+  background-position-y: center;
+  transition: transform 0.5s cubic-bezier(0.5, 0, 0.75, 0), opacity 0.5s ease;
+}
+
+.gallery-strip:nth-child(1) { background-position-x: 0%; }
+.gallery-strip:nth-child(2) { background-position-x: 20%; }
+.gallery-strip:nth-child(3) { background-position-x: 40%; }
+.gallery-strip:nth-child(4) { background-position-x: 60%; }
+.gallery-strip:nth-child(5) { background-position-x: 80%; }
+.gallery-strip:nth-child(6) { background-position-x: 100%; }
+
+/* Каждая полоска "отрезается" со своей задержкой — эффект пробегающих ножниц */
+.gallery-photo.is-cut .gallery-strip {
+  transform: translateY(120%) rotate(8deg);
+  opacity: 0;
+}
+.gallery-photo.is-cut .gallery-strip:nth-child(1) { transition-delay: 0ms; transform: translateY(120%) rotate(-10deg); }
+.gallery-photo.is-cut .gallery-strip:nth-child(2) { transition-delay: 60ms; transform: translateY(125%) rotate(8deg); }
+.gallery-photo.is-cut .gallery-strip:nth-child(3) { transition-delay: 120ms; transform: translateY(118%) rotate(-6deg); }
+.gallery-photo.is-cut .gallery-strip:nth-child(4) { transition-delay: 180ms; transform: translateY(122%) rotate(9deg); }
+.gallery-photo.is-cut .gallery-strip:nth-child(5) { transition-delay: 240ms; transform: translateY(115%) rotate(-8deg); }
+.gallery-photo.is-cut .gallery-strip:nth-child(6) { transition-delay: 300ms; transform: translateY(128%) rotate(7deg); }
+
+.gallery-swipe {
+  position: absolute;
+  top: 50%;
+  left: -10%;
+  width: 34px;
+  height: 34px;
+  transform: translate(0, -50%);
+  color: var(--accent-light);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+}
+
+.gallery-photo.is-cut .gallery-swipe {
+  animation: gallerySwipe 0.65s ease forwards;
+}
+
+@keyframes gallerySwipe {
+  0%   { left: -10%; opacity: 1; }
+  85%  { opacity: 1; }
+  100% { left: 105%; opacity: 0; }
+}
+
+.gallery-badge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 2;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: var(--btn-transform);
+  letter-spacing: 1px;
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--text-primary);
+  backdrop-filter: blur(2px);
+  transition: opacity 0.3s ease;
+}
+
+.gallery-badge-before { opacity: 1; }
+.gallery-badge-after { opacity: 0; }
+
+.gallery-photo.is-cut .gallery-badge-before { opacity: 0; }
+.gallery-photo.is-cut .gallery-badge-after { opacity: 1; }
+
+.gallery-caption {
+  margin-top: 0.6rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-strip {
+    transition: opacity 0.2s ease;
+    transform: none !important;
+  }
+  .gallery-photo.is-cut .gallery-strip {
+    opacity: 0;
+  }
+  .gallery-swipe {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.8rem;
+  }
+}
