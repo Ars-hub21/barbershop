@@ -49,6 +49,9 @@ const Dashboard = {
             <span class="master-status">${m.title || 'Барбер'}</span>
             <span class="master-rating-small" id="rating${m.key}"></span>
           </div>
+          <button type="button" class="btn-pin-master" data-master="${m.name}" title="Показывать эту карточку первой на этом устройстве">
+            <i class="fas fa-star"></i>
+          </button>
           <button class="btn btn-accent btn-add-busy" data-master="${m.name}">
             <i class="fas fa-plus"></i> Занят
           </button>
@@ -58,6 +61,79 @@ const Dashboard = {
         </div>
       </div>
     `).join('');
+
+    // Запоминаем исходный порядок колонок (как в ../js/data/masters.js) —
+    // нужен, чтобы при снятии "закрепления" вернуть карточки на их обычные
+    // места, а не просто оставить их в том порядке, в каком они оказались
+    // после последнего закрепления.
+    this._originalColumns = Array.from(grid.children);
+
+    this.applyMasterPinOrder();
+    this.initMasterPinButtons();
+  },
+
+  // ===== "ЗАКРЕПИТЬ ПЕРВЫМ НА ЭТОМ УСТРОЙСТВЕ" =====
+  // Мастер на СВОЁМ телефоне может отметить свою карточку, чтобы она
+  // всегда открывалась первой (не нужно листать вниз до себя). Хранится
+  // в localStorage — то есть чисто локально на этом телефоне/браузере,
+  // ни с чем не синхронизируется и не влияет на то, что видят другие.
+  PIN_STORAGE_KEY: 'pinnedMasterName',
+
+  getPinnedMaster: function () {
+    return localStorage.getItem(this.PIN_STORAGE_KEY) || null;
+  },
+
+  setPinnedMaster: function (name) {
+    if (name) {
+      localStorage.setItem(this.PIN_STORAGE_KEY, name);
+    } else {
+      localStorage.removeItem(this.PIN_STORAGE_KEY);
+    }
+  },
+
+  // Переставляет DOM-узлы колонок (не пересоздаёт их!) — так все уже
+  // навешенные обработчики (сворачивание, кнопка "Занят" и т.д.) и уже
+  // отрисованные заказы остаются на месте, просто карточки меняются местами.
+  applyMasterPinOrder: function () {
+    const grid = document.getElementById('dashboardGrid');
+    if (!grid || !this._originalColumns) return;
+
+    const pinned = this.getPinnedMaster();
+    const ordered = this._originalColumns.slice();
+
+    if (pinned) {
+      const idx = ordered.findIndex(el => el.dataset.master === pinned);
+      if (idx > 0) {
+        const [el] = ordered.splice(idx, 1);
+        ordered.unshift(el);
+      }
+    }
+
+    ordered.forEach(el => grid.appendChild(el));
+
+    // Обновляем визуальное состояние кнопок закрепления
+    grid.querySelectorAll('.btn-pin-master').forEach(btn => {
+      const isPinned = pinned && btn.dataset.master === pinned;
+      btn.classList.toggle('pinned', !!isPinned);
+      btn.title = isPinned
+        ? 'Убрать из первых на этом устройстве'
+        : 'Показывать эту карточку первой на этом устройстве';
+    });
+  },
+
+  initMasterPinButtons: function () {
+    document.querySelectorAll('.btn-pin-master').forEach(btn => {
+      if (btn.dataset.pinInitialized === 'true') return;
+      btn.dataset.pinInitialized = 'true';
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const name = btn.dataset.master;
+        const current = this.getPinnedMaster();
+        this.setPinnedMaster(current === name ? null : name);
+        this.applyMasterPinOrder();
+      });
+    });
   },
 
   // ===== ОБНОВЛЕНИЕ ОТОБРАЖЕНИЯ ДАТЫ =====

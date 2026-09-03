@@ -228,24 +228,31 @@ body {
 }
 
 /* ========== Дашборд ========== */
-/* Сетка колонок мастеров — CSS Grid с auto-fit вместо ручных долей.
-   Подстраивается САМА под любое число мастеров (1-50): один мастер —
-   одна аккуратная колонка по центру, а не пол-экрана; десятки мастеров —
-   столько колонок, сколько влезает по ширине, остальные переносятся на
-   следующую строку. Комбинируется с "схлопыванием" колонки по двойному
-   клику (components/columnToggle.js) — так с большим числом мастеров
-   ненужные колонки можно свернуть до заголовка. */
+/* Сетка колонок мастеров — CSS multi-column ("газетная" раскладка) вместо
+   CSS Grid. Подстраивается САМА под любое число мастеров (1-50): один
+   мастер — одна аккуратная колонка по центру, а не пол-экрана; десятки
+   мастеров — столько колонок, сколько влезает по ширине.
+
+   ПОЧЕМУ НЕ CSS GRID: в обычном Grid высота КАЖДОЙ строки равна высоте
+   самой высокой карточки в этой строке — если в одной строке рядом со
+   свёрнутой (короткой) карточкой мастера стоит развёрнутая (длинная), под
+   свёрнутой остаётся пустой "мёртвый" блок высотой почти во всю строку, и
+   следующая строка карточек начинается только после самой высокой из
+   предыдущей — те самые "лишние клетки". Multi-column раскладка каждую
+   колонку заполняет карточками подряд, одна под другой, независимо от
+   высоты карточек в соседних колонках — свёрнутая карточка сразу
+   освобождает место для следующей. */
 .dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  align-items: start;
+  columns: 300px;
+  column-gap: 1.5rem;
 }
 
 .master-column {
   width: 100%;
   max-width: 480px;
-  justify-self: center;
+  margin: 0 auto 1.5rem;
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
   background: var(--bg-secondary);
   border-radius: var(--radius);
   overflow: hidden;
@@ -256,11 +263,10 @@ body {
 }
 
 /* Когда мастеров очень много (примерно от 5 и выше), одной колонке незачем
-   тянуться до 480px — даём сетке больше "воздуха" между колонками и чуть
-   уменьшаем минимальную ширину трека, чтобы на широких экранах помещалось
-   больше колонок одновременно. */
+   тянуться до 480px — уменьшаем желаемую ширину колонки, чтобы на широких
+   экранах помещалось больше колонок одновременно. */
 .dashboard-grid[data-density="compact"] {
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  columns: 260px;
 }
 
 .dashboard-grid[data-density="compact"] .master-column {
@@ -271,19 +277,20 @@ body {
 /* Адаптивность для панели */
 @media (max-width: 1024px) {
   .dashboard-grid {
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    columns: 260px;
   }
 }
 
 @media (max-width: 768px) {
   .dashboard-grid {
-    gap: 1rem;
-    grid-template-columns: 1fr;
+    columns: 1;
+    column-gap: 0;
   }
 
   .master-column {
     max-width: none;
     min-height: 400px;
+    margin: 0 0 1rem;
   }
 }
 
@@ -310,12 +317,21 @@ body {
   overflow: hidden;
   border: 2px solid var(--accent);
   flex-shrink: 0;
+  /* Фон на случай прозрачных иконок/SVG-плейсхолдеров — чтобы кружок
+     всегда выглядел одинаково заполненным, а не "просвечивал". */
+  background: var(--bg-card);
 }
 
 .column-header .master-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Приводим ВСЕ иконки/фото мастеров к единому визуальному стилю: у
+     части мастеров были цветные значки с собственным фоном, у других —
+     блёклый серый SVG-плейсхолдер, из-за чего карточки в панели
+     выглядели неаккуратно и по-разному. Ч/б фильтр делает все аватарки
+     единообразными независимо от исходной картинки. */
+  filter: grayscale(1) contrast(1.05);
 }
 
 .column-title {
@@ -597,7 +613,10 @@ body {
     
     .edit-price-input {
         width: 55px;
-        font-size: 0.8rem;
+        /* НЕ меньше 16px: на мобильных (iOS Safari и др.) поле ввода с
+           font-size < 16px заставляет браузер автоматически "зумить"
+           страницу при фокусе — это и есть баг "экран увеличивается". */
+        font-size: 16px;
     }
 }
 
@@ -799,7 +818,9 @@ body {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   color: var(--text-primary);
-  font-size: 0.95rem;
+  /* НЕ меньше 16px — иначе на мобильных при фокусе на поле браузер сам
+     "зумит" страницу (баг "экран увеличивается при внесении изменений"). */
+  font-size: 16px;
   font-family: inherit;
 }
 
@@ -1045,11 +1066,6 @@ body {
 
 /* ========== Адаптивность ========== */
 @media (max-width: 1024px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
   .column-content {
     min-height: 450px;
   }
@@ -1114,10 +1130,6 @@ body {
 
   .dashboard-title {
     font-size: 1.2rem;
-  }
-
-  .dashboard-grid {
-    gap: 0.8rem;
   }
 
   .column-content {
@@ -1303,7 +1315,7 @@ body {
   }
 
   .popup-body .form-group input {
-    font-size: 0.85rem;
+    font-size: 16px; /* см. комментарий у базового правила — не уменьшать ниже 16px */
     padding: 0.3rem 0.5rem;
   }
 
@@ -1368,7 +1380,7 @@ body {
   }
 
   .login-box input {
-    font-size: 0.9rem;
+    font-size: 16px; /* не уменьшать ниже 16px — иначе зум при фокусе на мобильных */
     padding: 0.6rem 0.8rem;
   }
 
