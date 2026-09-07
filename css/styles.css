@@ -293,6 +293,26 @@ body::before {
   color: var(--text-primary);
 }
 
+/* Лоадер мини-слотов на карточке мастера (пока грузится пакетный кэш) —
+   тот же спиннер (@keyframes spin), что и на странице выбора времени,
+   просто уменьшенный под размер маленькой плашки. */
+.master-slots .slot-time.slot-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-secondary);
+}
+
+.master-slots .mini-spinner {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-top: 2px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
 .master-slots .slot-time.no-slots {
   background: rgba(239, 68, 68, 0.05);
   border-color: rgba(239, 68, 68, 0.15);
