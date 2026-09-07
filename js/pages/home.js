@@ -92,8 +92,20 @@ const Home = {
       const slotsEl = document.getElementById(`slots${masterKey}`);
       if (!slotsEl) return;
 
+      // ПОКА ПАКЕТНЫЙ КЭШ ЕЩЁ ГРУЗИТСЯ С СЕРВЕРА — показываем лоадер вместо
+      // "Запись закрыта". Раньше здесь сразу считалось, что слотов нет (кэш
+      // пуст на старте), из-за чего на секунду-две у ВСЕХ мастеров ошибочно
+      // мелькала надпись "Запись закрыта", хотя на самом деле время ещё
+      // не успело загрузиться. Когда GlobalCache.isReady станет true, эта
+      // функция перевызовется через addListener (см. Home.init) и покажет
+      // уже настоящие данные.
+      if (!GlobalCache.isReady) {
+        slotsEl.innerHTML = '<span class="slot-time slot-loading"><span class="mini-spinner"></span> Загрузка...</span>';
+        return;
+      }
+
       const slots = GlobalCache.getSlots(master.name, today, 15);
-      
+
       if (slots && Array.isArray(slots) && slots.length > 0) {
         const futureSlots = slots.filter(slot => {
           if (typeof TimeUtils !== 'undefined' && TimeUtils.timeToMinutes) {
