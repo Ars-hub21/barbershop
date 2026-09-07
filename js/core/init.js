@@ -11,9 +11,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (GlobalCache.loadCache()) {
       GlobalCache.notifyListeners();
     } else if (!GlobalCache.isLoading) {
-      setTimeout(() => {
-        GlobalCache.preloadAllSlots();
-      }, 300);
+      // Раньше здесь была искусственная пауза setTimeout(…, 300) перед стартом
+      // скачивания слотов — она ничего не ждала (DOM уже готов, masters уже
+      // определены), а только добавляла лишние ~300мс к и без того не самой
+      // быстрой первой загрузке. Запускаем скачивание сразу.
+      GlobalCache.preloadAllSlots();
     }
   }
 
