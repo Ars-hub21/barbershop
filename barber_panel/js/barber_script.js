@@ -22,8 +22,8 @@
 //    значения PANEL_PASSWORD_HASH ниже.
 //
 // Текущий пароль (сообщите только тем, кому доверяете вход в панель):
-//   UrusMartan_Panel-2026!
-const PANEL_PASSWORD_HASH = 'a6faff5e400fa33056395137343a28918deb4a09bd3894182ae41b3b9c021b68';
+//   parol
+const PANEL_PASSWORD_HASH = '1c62590c99871030411c60c4780da31ec05c4db349e2f02d79c01228fccd9380';
 
 async function sha256Hex(text) {
     const bytes = new TextEncoder().encode(text);
