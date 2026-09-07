@@ -1,23 +1,80 @@
 // js/pages/home.js - Главная страница выбора мастера (Часть 1)
 const Home = {
+  // Пока и рейтинг, и свободное время ещё не готовы — на карточке только
+  // ОДИН лоадер (в месте рейтинга). Раньше рейтинг и слоты грузились и
+  // появлялись независимо друг от друга — получалось два разных лоадера
+  // на одной карточке, которые исчезали не одновременно. Теперь оба
+  // источника данных (отзывы + пакетный кэш слотов) ждём вместе и
+  // показываем результат одним разом, за один проход.
+  _firstRenderDone: false,
+
   init: function() {
     console.log('🏁 [Home] Инициализация Шага 1 с AppStorage...');
-    
+
     // 1. Генерируем карточки мастеров в DOM
     this.renderMasters();
-    
+
     // 2. Навешиваем глобальные обработчики событий (Делегирование)
     this.initEvents();
-    
-    // 3. Загружаем отзывы и заполняем слоты времени
-    this.loadReviewsAndSlots();
-    
-    // 4. Реагируем на фоновые пакетные обновления GlobalCache
+
+    // 3. Загружаем отзывы и слоты и показываем всё сразу одним проходом
+    this.loadAll();
+
+    // 4. Реагируем на фоновые пакетные обновления GlobalCache (например,
+    // точечный поллинг раз в 15с) — но только ПОСЛЕ того, как первый общий
+    // рендер уже случился, чтобы не запускать повторное мигание лоадера.
     if (typeof GlobalCache !== 'undefined' && typeof GlobalCache.addListener === 'function') {
       GlobalCache.addListener(() => {
-        this.updateSlotsFromCache();
+        if (this._firstRenderDone) this.updateSlotsFromCache();
       });
     }
+  },
+
+  loadAll: function() {
+    const reviewsPromise = (typeof API !== 'undefined' && API.getReviews)
+      ? API.getReviews().catch(err => {
+          console.warn('[BarberHome] Не удалось подгрузить отзывы клиентов:', err);
+          return null;
+        })
+      : Promise.resolve(null);
+
+    // Ждём готовности пакетного кэша слотов тем же способом, что и остальной
+    // сайт (GlobalCache.addListener сам вызовет колбэк сразу, если кэш уже
+    // готов — например, при возврате на главную внутри той же сессии).
+    const cachePromise = new Promise(resolve => {
+      if (typeof GlobalCache === 'undefined' || typeof GlobalCache.addListener !== 'function') {
+        resolve();
+        return;
+      }
+      GlobalCache.addListener(resolve);
+    });
+
+    Promise.all([reviewsPromise, cachePromise]).then(([reviewsData]) => {
+      this.renderAllMasterInfo(reviewsData);
+    });
+  },
+
+  renderAllMasterInfo: function(reviewsData) {
+    this._firstRenderDone = true;
+
+    masters.forEach(master => {
+      const masterKey = getMasterKey(master.name);
+      const ratingEl = document.getElementById(`rating${masterKey}`);
+      if (!ratingEl) return;
+
+      const masterReviews = (reviewsData && reviewsData.success && Array.isArray(reviewsData.reviews))
+        ? reviewsData.reviews.filter(r => r.masterName === master.name)
+        : [];
+      const rating = masterReviews.length > 0
+        ? masterReviews.reduce((sum, r) => sum + Number(r.rating), 0) / masterReviews.length
+        : 0;
+
+      ratingEl.innerHTML = rating > 0
+        ? `${this.renderStars(rating)} <span class="rating-count">(${masterReviews.length})</span>`
+        : '<span class="rating-count">Новый мастер</span>';
+    });
+
+    this.updateSlotsFromCache();
   },
 
   renderMasters: function() {
@@ -41,7 +98,7 @@ const Home = {
           <div class="master-card-info">
             <div class="master-name">${master.name}</div>
             <div class="master-title">${master.title || (typeof BRAND !== 'undefined' && BRAND.roleLabel) || 'Барбер'}</div>
-            <div class="master-rating" id="rating${masterKey}">⏳ Загрузка...</div>
+            <div class="master-rating" id="rating${masterKey}"><span class="mini-spinner"></span> Загрузка...</div>
             <div class="master-slots" id="slots${masterKey}"></div>
           </div>
         </div>
@@ -92,17 +149,12 @@ const Home = {
       const slotsEl = document.getElementById(`slots${masterKey}`);
       if (!slotsEl) return;
 
-      // ПОКА ПАКЕТНЫЙ КЭШ ЕЩЁ ГРУЗИТСЯ С СЕРВЕРА — показываем лоадер вместо
-      // "Запись закрыта". Раньше здесь сразу считалось, что слотов нет (кэш
-      // пуст на старте), из-за чего на секунду-две у ВСЕХ мастеров ошибочно
-      // мелькала надпись "Запись закрыта", хотя на самом деле время ещё
-      // не успело загрузиться. Когда GlobalCache.isReady станет true, эта
-      // функция перевызовется через addListener (см. Home.init) и покажет
-      // уже настоящие данные.
-      if (!GlobalCache.isReady) {
-        slotsEl.innerHTML = '<span class="slot-time slot-loading"><span class="mini-spinner"></span> Загрузка...</span>';
-        return;
-      }
+      // Эта функция вызывается только после того, как единый лоадер на
+      // карточке (см. renderAllMasterInfo/loadAll) уже дождался готовности
+      // пакетного кэша — поэтому отдельный лоадер здесь не нужен. Если её
+      // всё же вызвали раньше времени (защитный случай), просто ничего не
+      // показываем вместо ошибочного "Запись закрыта".
+      if (!GlobalCache.isReady) return;
 
       const slots = GlobalCache.getSlots(master.name, today, 15);
 
