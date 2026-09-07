@@ -191,7 +191,11 @@ body::before {
 
 .master-card.selected {
   border-color: var(--accent);
-  background: #1b1e26; /* Слегка светлее в выбранном состоянии */
+  /* Было зашито намертво (#1b1e26 — тёмно-синий, подходил только мужской
+     тёмной теме) и не менялось с темой сайта. var(--bg-input) даёт тот же
+     эффект "чуть выделяется на фоне карточки", но уже в цвете текущей
+     темы — тёмном для мужской, мягком розовом для женской. */
+  background: var(--bg-input);
   box-shadow: var(--shadow-glow);
 }
 
@@ -313,7 +317,7 @@ body::before {
 .master-slots .slot-time.no-slots {
   background: rgba(239, 68, 68, 0.05);
   border-color: rgba(239, 68, 68, 0.15);
-  color: #ffa4a4;
+  color: var(--danger);
   font-size: 0.75rem;
   width: 100%;
   text-align: center;
@@ -591,7 +595,7 @@ body::before {
 .calendar-grid .day-cell.available {
   background: rgba(16, 185, 129, 0.04);
   border: 1px solid rgba(16, 185, 129, 0.15);
-  color: #a7f3d0;
+  color: var(--success);
 }
 
 .calendar-grid .day-cell.available:hover {
@@ -712,7 +716,7 @@ body::before {
 }
 
 .no-slots-message p {
-  color: #fca5a5;
+  color: var(--danger);
   font-weight: 600;
   margin-bottom: 0.8rem;
   font-size: 0.95rem;
@@ -825,7 +829,9 @@ body::before {
 /* Состояние когда услуга выбрана */
 .service-card.selected {
   border-color: var(--accent);
-  background: #1b1e26;
+  /* Та же правка, что и у .master-card.selected — было зашито тёмным
+     цветом намертво, теперь берёт цвет из текущей темы. */
+  background: var(--bg-input);
   box-shadow: var(--shadow-glow);
 }
 
