@@ -8,14 +8,21 @@
      страницы (сама история и её логика — barber-history.js — не трогаются
      вообще, просто визуально прячутся под вкладку).
    - На вкладке "Галерея": форма — пол (мужская/женская), название работы
-     (например "Классическая стрижка"), тип фото (До/После) и выбор файла.
-   - После выбора файла открывается окно кадрирования — как при загрузке
-     аватарки в Instagram: фото можно двигать пальцем/мышью и увеличивать
-     ползунком, рамка всегда ровно 4:3 (формат карточек галереи на сайте).
+     (например "Классическая стрижка") и ДВЕ КОЛОНКИ загрузки — "Фото До"
+     и "Фото После" — рядом друг с другом, каждая со своим окном
+     кадрирования. Так обе фотографии одной работы загружаются сразу одним
+     действием, а не по очереди через выпадающий список "Тип фото" (как
+     было раньше) — и в списке добавленного за сессию они тоже показаны
+     парой, колонками, а не двумя отдельными строками.
+   - После выбора файла в любой из колонок открывается окно кадрирования —
+     как при загрузке аватарки в Instagram: фото можно двигать пальцем/
+     мышью и увеличивать ползунком, рамка всегда ровно 4:3 (формат карточек
+     галереи на сайте).
    - После подтверждения кадра фото конвертируется в формат WebP (меньше
-     вес, быстрее грузится) и отправляется на сервер через уже существующий
-     общий метод API.post(...) из barber_panel/js/api.js — этот файл НЕ
-     редактировался, используется как есть.
+     вес, быстрее грузится). По кнопке "Отправить" обе фотографии (до и
+     после — можно отправить и только одну, если вторая ещё не готова)
+     уходят на сервер ОДНИМ запросом через уже существующий общий метод
+     API.post(...) из barber_panel/js/api.js — этот файл НЕ редактировался.
 
    ВАЖНО — ЧТО ЭТОТ ФАЙЛ НЕ ДЕЛАЕТ:
    - Не трогает js/core/api.js, js/core/config.js, js/core/storage.js,
@@ -26,12 +33,16 @@
      появляются на самом сайте только после того, как администратор сам
      решит их туда добавить (так же вручную, как и все остальные фото и
      данные в этом проекте — см. barber_panel/masters.html для сравнения).
-   - Действие 'addGalleryPhoto', которое эта форма отправляет на сервер,
-     ПОКА НЕ СУЩЕСТВУЕТ в Google Apps Script — что именно нужно добавить
-     на стороне Google, подробно описано в barber_panel/google/GALLERY-SHEET-SETUP.md.
-     Пока это не сделано, форма будет показывать ошибку отправки — это
-     ожидаемо, кадрирование и конвертация в WebP при этом уже полностью
-     работают.
+
+   ИСПРАВЛЕНО (после проверки реального Google Apps Script, файл Utils.gs):
+   действие 'addGalleryPhoto' на сервере УЖЕ существует (Utils.saveGalleryPair),
+   но ждёт ОДИН запрос с полями imageBeforeBase64 + imageAfterBase64 на пару
+   фото — а эта форма раньше отправляла ДВА отдельных запроса (по одному на
+   фото, с полями imageBase64 + type). Из-за несовпадения имён полей сервер
+   получал пустые imageBeforeBase64/imageAfterBase64 и дважды дописывал в
+   таблицу строку с датой/полом/названием, но БЕЗ фото — ровно то, на что
+   жаловались ("основная информация сохраняется, а фото нет"). Теперь
+   отправляется один запрос с теми полями, которые сервер реально читает.
    ========================================================================== */
 
 (function () {
@@ -50,7 +61,13 @@
   var OUTPUT_HEIGHT = Math.round(OUTPUT_WIDTH / TARGET_RATIO); // 675
   var MAX_BASE64_LENGTH = 45000; // запас внутри лимита ячейки Google Таблицы (~50 000 символов)
 
-  var queue = []; // { id, gender, title, type, thumb, status } — только на время сессии, для наглядности
+  var TYPE_LABEL = { before: 'До', after: 'После' };
+  var GENDER_LABEL = { masculine: 'Мужская', feminine: 'Женская' };
+
+  var queue = []; // { id, gender, title, before:{thumb,status}, after:{thumb,status} } — только на время сессии
+
+  // Фото, уже подобранные для ТЕКУЩЕЙ, ещё не отправленной пары "до/после".
+  var pending = { before: null, after: null };
 
   /* ============================== МОНТИРОВАНИЕ ВКЛАДОК ============================== */
 
@@ -97,8 +114,8 @@
     panel.innerHTML =
       '<div class="gt-panel-intro">' +
         'Фото сохраняются в Google Таблицу (лист <code>Галерея</code>) в формате WebP. ' +
-        'Чтобы они появились на самом сайте, администратор переносит их в галерею вручную — ' +
-        'так же, как обновляются мастера и другие фото в этом проекте.' +
+        'Загрузите фото "До" и "После" одной работы рядом — они отправятся вместе — ' +
+        'и перенесите их на сам сайт вручную, так же, как обновляются мастера и другие данные проекта.' +
       '</div>' +
       '<form class="gt-upload-form" id="gtUploadForm">' +
         '<div class="form-group">' +
@@ -113,21 +130,14 @@
           '<input type="text" id="gtTitle" list="gtCategoryList" placeholder="Например: Классическая стрижка" />' +
           '<datalist id="gtCategoryList"></datalist>' +
         '</div>' +
-        '<div class="form-group">' +
-          '<label for="gtType">Тип фото</label>' +
-          '<select id="gtType">' +
-            '<option value="before">До</option>' +
-            '<option value="after">После</option>' +
-          '</select>' +
-        '</div>' +
-        '<div class="gt-file-row">' +
-          '<label class="gt-file-label" for="gtFileInput">' +
-            '<i class="fas fa-camera"></i> Выбрать фото' +
-          '</label>' +
-          '<input type="file" id="gtFileInput" accept="image/*" hidden />' +
-          '<span class="gt-file-name" id="gtFileName">Файл не выбран</span>' +
-        '</div>' +
       '</form>' +
+      '<div class="gt-before-after-row">' +
+        buildPhotoSlotMarkup('before', 'Фото «До»') +
+        buildPhotoSlotMarkup('after', 'Фото «После»') +
+      '</div>' +
+      '<button type="button" class="btn btn-primary gt-submit-pair-btn" id="gtSubmitPairBtn" disabled>' +
+        '<i class="fas fa-paper-plane"></i> Отправить' +
+      '</button>' +
       '<div id="gtStatusLine" class="gt-status-line"></div>' +
       '<div class="gt-queue" id="gtQueue"><p class="gt-queue-empty">Пока ничего не добавлено в этой сессии.</p></div>' +
       buildModalMarkup();
@@ -142,17 +152,40 @@
     genderSelect.addEventListener('change', refreshSuggestions);
     refreshSuggestions();
 
-    // Выбор файла -> сразу открываем кадрирование
-    var fileInput = panel.querySelector('#gtFileInput');
-    var fileNameEl = panel.querySelector('#gtFileName');
-    fileInput.addEventListener('change', function () {
-      var file = fileInput.files && fileInput.files[0];
-      if (!file) return;
-      fileNameEl.textContent = file.name;
-      openCropper(panel, file);
+    // Выбор файла в любой из двух колонок -> сразу открываем кадрирование,
+    // помечая, какая колонка (до/после) сейчас кадрируется.
+    ['before', 'after'].forEach(function (type) {
+      var fileInput = panel.querySelector('#gtFileInput_' + type);
+      fileInput.addEventListener('change', function () {
+        var file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        openCropper(panel, file, type);
+      });
+    });
+
+    panel.querySelector('#gtSubmitPairBtn').addEventListener('click', function () {
+      submitPending(panel);
     });
 
     return panel;
+  }
+
+  function buildPhotoSlotMarkup(type, label) {
+    return (
+      '<div class="gt-photo-slot" data-type="' + type + '">' +
+        '<div class="gt-photo-slot-label">' + label + '</div>' +
+        '<div class="gt-slot-preview" id="gtPreview_' + type + '">' +
+          '<i class="fas fa-camera"></i>' +
+        '</div>' +
+        '<label class="gt-file-label" for="gtFileInput_' + type + '">' +
+          '<i class="fas fa-upload"></i> Выбрать фото' +
+        '</label>' +
+        '<input type="file" id="gtFileInput_' + type + '" accept="image/*" hidden />' +
+        '<button type="button" class="gt-slot-clear" id="gtClear_' + type + '" hidden title="Убрать фото">' +
+          '<i class="fas fa-times"></i>' +
+        '</button>' +
+      '</div>'
+    );
   }
 
   /* ============================== ОКНО КАДРИРОВАНИЯ ============================== */
@@ -186,14 +219,17 @@
     natW: 0, natH: 0, baseScale: 1, scale: 1, x: 0, y: 0,
     viewportW: 0, viewportH: 0, dragging: false,
     startPX: 0, startPY: 0, startX: 0, startY: 0,
-    objectUrl: null
+    objectUrl: null,
+    activeType: null // 'before' | 'after' — какая колонка сейчас кадрируется
   };
 
-  function openCropper(panel, file) {
+  function openCropper(panel, file, type) {
     var overlay = panel.querySelector('#gtModalOverlay');
     var img = panel.querySelector('#gtCropImage');
     var viewport = panel.querySelector('#gtCropViewport');
     var zoomRange = panel.querySelector('#gtZoomRange');
+
+    crop.activeType = type;
 
     if (crop.objectUrl) URL.revokeObjectURL(crop.objectUrl);
     crop.objectUrl = URL.createObjectURL(file);
@@ -273,14 +309,14 @@
 
     cancelBtn.onclick = function () {
       overlay.hidden = true;
-      panel.querySelector('#gtFileInput').value = '';
-      panel.querySelector('#gtFileName').textContent = 'Файл не выбран';
+      var slotType = crop.activeType;
+      panel.querySelector('#gtFileInput_' + slotType).value = '';
     };
 
     confirmBtn.onclick = function () {
       var dataUrl = renderCroppedWebp(img);
       overlay.hidden = true;
-      handleCroppedPhoto(panel, dataUrl);
+      handleCroppedPhoto(panel, dataUrl, crop.activeType);
     };
   }
 
@@ -323,21 +359,50 @@
     return dataUrl;
   }
 
+  /* ============================== ПОДГОТОВКА ПАРЫ "ДО/ПОСЛЕ" ============================== */
+
+  // Кадр подтверждён — сохраняем его как "готово к отправке" для своей
+  // колонки (до/после), обновляем превью и разблокируем кнопку "Отправить",
+  // как только готова хотя бы одна из двух фотографий.
+  function handleCroppedPhoto(panel, dataUrl, type) {
+    pending[type] = dataUrl;
+
+    var preview = panel.querySelector('#gtPreview_' + type);
+    preview.innerHTML = '<img src="' + dataUrl + '" alt="" />';
+
+    var clearBtn = panel.querySelector('#gtClear_' + type);
+    clearBtn.hidden = false;
+    clearBtn.onclick = function () {
+      pending[type] = null;
+      preview.innerHTML = '<i class="fas fa-camera"></i>';
+      clearBtn.hidden = true;
+      panel.querySelector('#gtFileInput_' + type).value = '';
+      updateSubmitButtonState(panel);
+    };
+
+    updateSubmitButtonState(panel);
+  }
+
+  function updateSubmitButtonState(panel) {
+    var submitBtn = panel.querySelector('#gtSubmitPairBtn');
+    submitBtn.disabled = !pending.before && !pending.after;
+  }
+
   /* ============================== ОТПРАВКА НА СЕРВЕР ============================== */
 
-  function handleCroppedPhoto(panel, dataUrl) {
+  function submitPending(panel) {
     var gender = panel.querySelector('#gtGender').value;
     var title = panel.querySelector('#gtTitle').value.trim() || 'Без названия';
-    var type = panel.querySelector('#gtType').value;
     var statusLine = panel.querySelector('#gtStatusLine');
+
+    if (!pending.before && !pending.after) return;
 
     var entry = {
       id: 'g' + Date.now() + Math.random().toString(16).slice(2, 6),
       gender: gender,
       title: title,
-      type: type,
-      thumb: dataUrl,
-      status: 'pending'
+      before: pending.before ? { thumb: pending.before, status: 'pending' } : null,
+      after: pending.after ? { thumb: pending.after, status: 'pending' } : null
     };
     queue.unshift(entry);
     renderQueue(panel);
@@ -345,42 +410,69 @@
     statusLine.className = 'gt-status-line';
     statusLine.textContent = 'Отправка на сервер…';
 
-    // Используем УЖЕ СУЩЕСТВУЮЩИЙ общий метод API.post (barber_panel/js/api.js) —
-    // этот файл не редактировался. Действие 'addGalleryPhoto' нужно добавить
-    // на стороне Google Apps Script — см. barber_panel/google/GALLERY-SHEET-SETUP.md.
-    var base64 = dataUrl.split(',')[1] || '';
-
     if (typeof API === 'undefined' || typeof API.post !== 'function') {
-      entry.status = 'error';
+      ['before', 'after'].forEach(function (type) {
+        if (entry[type]) entry[type].status = 'error';
+      });
       renderQueue(panel);
       statusLine.className = 'gt-status-line gt-error';
-      statusLine.textContent = 'Не найден модуль API (barber_panel/js/api.js) — фото сохранено только локально в этой вкладке.';
+      statusLine.textContent = 'Не найден модуль API (barber_panel/js/api.js) — фото сохранены только локально в этой вкладке.';
+      resetSlots(panel);
       return;
     }
 
-    API.post('addGalleryPhoto', {
+    // ВАЖНО: отправляем "до" и "после" ОДНИМ запросом, одной строкой в
+    // Google Таблицу — именно так их принимает существующий обработчик
+    // Utils.saveGalleryPair(data) на бэкенде: он читает data.imageBeforeBase64
+    // и data.imageAfterBase64 из ОДНОГО запроса. Раньше здесь уходило ДВА
+    // отдельных запроса (по одному на фото, с полем imageBase64 + type) —
+    // бэкенд каждый раз читал несуществующие imageBeforeBase64/imageAfterBase64
+    // как пустые строки, поэтому в таблицу попадала основная информация
+    // (пол, название, дата), а сами фото — нет. Теперь поля совпадают 1-в-1.
+    var payload = {
       gender: gender,
       title: title,
-      type: type,
       imageMime: 'image/webp',
-      imageBase64: base64,
+      imageBeforeBase64: entry.before ? (entry.before.thumb.split(',')[1] || '') : '',
+      imageAfterBase64: entry.after ? (entry.after.thumb.split(',')[1] || '') : '',
       capturedAt: new Date().toISOString()
-    }).then(function () {
-      entry.status = 'sent';
+    };
+
+    API.post('addGalleryPhoto', payload).then(function (result) {
+      var ok = !result || result.success !== false;
+      ['before', 'after'].forEach(function (type) {
+        if (entry[type]) entry[type].status = ok ? 'sent' : 'error';
+      });
       renderQueue(panel);
-      statusLine.className = 'gt-status-line gt-ok';
-      statusLine.textContent = 'Фото отправлено на сервер (лист "Галерея").';
-    }).catch(function (err) {
-      entry.status = 'error';
+
+      if (ok) {
+        statusLine.className = 'gt-status-line gt-ok';
+        statusLine.textContent = 'Фото отправлены на сервер (лист "Галерея").';
+      } else {
+        statusLine.className = 'gt-status-line gt-error';
+        statusLine.textContent = 'Сервер вернул ошибку при сохранении: ' + (result && result.error ? result.error : 'см. лист "Галерея"') + '.';
+      }
+    }).catch(function () {
+      ['before', 'after'].forEach(function (type) {
+        if (entry[type]) entry[type].status = 'error';
+      });
       renderQueue(panel);
       statusLine.className = 'gt-status-line gt-error';
-      statusLine.textContent = 'Не удалось отправить — похоже, на сервере ещё не настроен приём фото галереи. ' +
-        'Инструкция для программиста: barber_panel/google/GALLERY-SHEET-SETUP.md. (' + (err && err.message ? err.message : 'ошибка сети') + ')';
+      statusLine.textContent = 'Не удалось отправить — проверьте подключение и попробуйте ещё раз.';
     });
 
-    // Форма готова к следующему фото
-    panel.querySelector('#gtFileInput').value = '';
-    panel.querySelector('#gtFileName').textContent = 'Файл не выбран';
+    // Форма готова к следующей паре фото
+    resetSlots(panel);
+  }
+
+  function resetSlots(panel) {
+    pending = { before: null, after: null };
+    ['before', 'after'].forEach(function (type) {
+      panel.querySelector('#gtPreview_' + type).innerHTML = '<i class="fas fa-camera"></i>';
+      panel.querySelector('#gtClear_' + type).hidden = true;
+      panel.querySelector('#gtFileInput_' + type).value = '';
+    });
+    updateSubmitButtonState(panel);
   }
 
   function renderQueue(panel) {
@@ -389,21 +481,30 @@
       box.innerHTML = '<p class="gt-queue-empty">Пока ничего не добавлено в этой сессии.</p>';
       return;
     }
-    var genderLabel = { masculine: 'Мужская', feminine: 'Женская' };
-    var typeLabel = { before: 'До', after: 'После' };
     var statusLabel = { pending: 'Отправка…', sent: 'Отправлено', error: 'Ошибка' };
 
     box.innerHTML = queue.map(function (e) {
       return (
         '<div class="gt-queue-item">' +
-          '<img class="gt-queue-thumb" src="' + e.thumb + '" alt="" />' +
+          '<div class="gt-queue-photos">' +
+            buildQueueThumb(e.before, 'До') +
+            buildQueueThumb(e.after, 'После') +
+          '</div>' +
           '<div class="gt-queue-info">' +
             '<div class="gt-queue-title">' + escapeHtml(e.title) + '</div>' +
-            '<div class="gt-queue-meta">' + genderLabel[e.gender] + ' · ' + typeLabel[e.type] + '</div>' +
+            '<div class="gt-queue-meta">' + GENDER_LABEL[e.gender] + '</div>' +
           '</div>' +
-          '<span class="gt-queue-status ' + e.status + '">' + statusLabel[e.status] + '</span>' +
         '</div>'
       );
+      function buildQueueThumb(photo, label) {
+        if (!photo) return '<div class="gt-queue-thumb-col gt-queue-thumb-empty"><span>' + label + ' — нет</span></div>';
+        return (
+          '<div class="gt-queue-thumb-col">' +
+            '<img class="gt-queue-thumb" src="' + photo.thumb + '" alt="" />' +
+            '<span class="gt-queue-status ' + photo.status + '">' + label + ' · ' + statusLabel[photo.status] + '</span>' +
+          '</div>'
+        );
+      }
     }).join('');
   }
 

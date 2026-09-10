@@ -5,6 +5,37 @@
 // - Удаление карточек (отмена записи/занятости)
 
 // ============================================================
+// 0. РАЗБОР ЦЕНЫ ИЗ ТЕКСТА КАРТОЧКИ (НЕ ТЕРЯЯ ДИАПАЗОН С ТИРЕ)
+// ============================================================
+// Некоторые услуги в прайс-листе (js/data/services.js) стоят "неточно" —
+// диапазоном, например "300–500". Пока барбер не назначил точную цену
+// вручную, эта строка-диапазон может дойти и до карточки заказа/занятости
+// в панели как есть. Раньше цена везде разбиралась одинаково —
+// `parseInt(text.replace(/[^0-9]/g, ''))` — что для диапазона склеивало
+// обе границы в одно бессмысленное число ("300–500" → 300500) и по факту
+// "съедало" тире. Эта функция вместо этого распознаёт диапазон отдельно.
+function parsePriceFromText(text) {
+  const cleaned = String(text || '').replace(/₽/g, '').replace(/\s+/g, ' ').trim();
+  const rangeMatch = cleaned.match(/^(\d+)\s*[-–—]\s*(\d+)$/);
+
+  if (rangeMatch) {
+    return {
+      isRange: true,
+      text: `${rangeMatch[1]}–${rangeMatch[2]}`,
+      low: parseInt(rangeMatch[1], 10),
+      high: parseInt(rangeMatch[2], 10)
+    };
+  }
+
+  const digits = cleaned.replace(/[^0-9]/g, '');
+  return {
+    isRange: false,
+    text: digits || '0',
+    value: digits ? parseInt(digits, 10) : 0
+  };
+}
+
+// ============================================================
 // 1. УНИВЕРСАЛЬНАЯ ВСТАВКА КАРТОЧКИ
 // ============================================================
 function insertCard(container, html, selector) {
@@ -33,14 +64,25 @@ function initPriceEditor(options) {
     const id = card.getAttribute(options.idAttr);
     if (!id) return;
     
-    const currentPrice = parseInt(priceEl.textContent.replace(/[^0-9]/g, '')) || 0;
-    
+    const parsedPrice = parsePriceFromText(priceEl.textContent);
+    // Поле ввода — число, диапазон туда не поместить. Если цена ещё не
+    // назначена точно (диапазон, например "300–500"), подставляем нижнюю
+    // границу как отправную точку — барбер тут же вписывает точную сумму,
+    // вместо того чтобы поле молча предзаполнилось слипшимся мусорным
+    // числом вроде 300500.
+    const currentPrice = parsedPrice.isRange ? parsedPrice.low : (parsedPrice.value || 0);
+    const currentPriceDisplay = parsedPrice.isRange ? parsedPrice.text : String(currentPrice);
+
     // Создаем поле ввода
     const input = document.createElement('input');
     input.type = 'number';
     input.className = 'edit-price-input';
     input.value = currentPrice;
     input.min = 0;
+    if (parsedPrice.isRange) {
+      input.title = `Была указана неточная цена (${parsedPrice.text} ₽) — укажите точную сумму`;
+      input.placeholder = parsedPrice.text;
+    }
     
     priceEl.textContent = '';
     priceEl.appendChild(input);
@@ -49,22 +91,31 @@ function initPriceEditor(options) {
     
     const savePrice = () => {
       const newPrice = parseInt(input.value);
+      // Если поле не трогали (значение осталось равно предложенной нижней
+      // границе диапазона) — считаем, что барбер передумал редактировать,
+      // и возвращаем исходный диапазон как есть, а не подменяем его молча
+      // одним числом.
+      if (parsedPrice.isRange && String(input.value) === String(currentPrice)) {
+        priceEl.textContent = currentPriceDisplay + ' ₽';
+        return;
+      }
       if (!isNaN(newPrice) && newPrice >= 0) {
         if (options.onSave) {
           options.onSave(id, newPrice);
         }
         priceEl.textContent = newPrice + ' ₽';
       } else {
-        priceEl.textContent = currentPrice + ' ₽';
+        priceEl.textContent = currentPriceDisplay + ' ₽';
       }
     };
-    
+
     input.addEventListener('blur', savePrice);
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-      if (e.key === 'Escape') { 
+      if (e.key === 'Escape') {
         e.preventDefault();
-        priceEl.textContent = currentPrice + ' ₽';
+        priceEl.textContent = currentPriceDisplay + ' ₽';
+        input.removeEventListener('blur', savePrice);
       }
     });
     input.addEventListener('click', (e) => e.stopPropagation());

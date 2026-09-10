@@ -103,25 +103,17 @@
   border-color: var(--accent);
 }
 
-.gt-file-row {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  align-items: center;
-}
-
 .gt-file-label {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.7rem 1.1rem;
+  padding: 0.6rem 1rem;
   background: var(--accent);
   color: var(--bg-primary);
   border-radius: var(--radius);
   font-weight: 600;
   cursor: pointer;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   transition: var(--transition);
 }
 
@@ -129,9 +121,85 @@
   filter: brightness(1.08);
 }
 
-.gt-file-name {
+/* ---------- Колонки "До" / "После" (загрузка рядом, одной парой) ---------- */
+.gt-before-after-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.gt-photo-slot {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  position: relative;
+}
+
+.gt-photo-slot-label {
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.gt-slot-preview {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  background: var(--bg-input, var(--bg-primary));
+  border: 1px dashed var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--text-secondary);
-  font-size: 0.85rem;
+  font-size: 1.6rem;
+  overflow: hidden;
+}
+
+.gt-slot-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gt-slot-clear {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.gt-slot-clear:hover {
+  background: var(--danger, #ef4444);
+}
+
+.gt-submit-pair-btn {
+  width: 100%;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.gt-submit-pair-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ---------- Список добавленного за сессию ---------- */
@@ -156,14 +224,45 @@
   padding: 0.7rem 0.9rem;
 }
 
+/* Пара "до/после" одной записи — рядом, колонками. */
+.gt-queue-photos {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.gt-queue-thumb-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
 .gt-queue-thumb {
   width: 64px;
   height: 48px;
   border-radius: 6px;
   object-fit: cover;
-  flex-shrink: 0;
   border: 1px solid var(--border-color);
   background: var(--bg-secondary);
+}
+
+.gt-queue-thumb-empty {
+  width: 64px;
+  height: 48px;
+  border-radius: 6px;
+  border: 1px dashed var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.gt-queue-thumb-empty span {
+  color: var(--text-secondary);
+  font-size: 0.62rem;
+  line-height: 1.2;
+  padding: 0 0.2rem;
 }
 
 .gt-queue-info {
@@ -184,10 +283,9 @@
 }
 
 .gt-queue-status {
-  font-size: 0.78rem;
-  padding: 0.25rem 0.6rem;
+  font-size: 0.68rem;
+  padding: 0.15rem 0.4rem;
   border-radius: 999px;
-  flex-shrink: 0;
   white-space: nowrap;
 }
 
@@ -312,5 +410,13 @@
 
   .gt-upload-form {
     grid-template-columns: 1fr;
+  }
+
+  .gt-before-after-row {
+    grid-template-columns: 1fr;
+  }
+
+  .gt-queue-item {
+    flex-wrap: wrap;
   }
 }

@@ -133,13 +133,28 @@ body {
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  flex-wrap: wrap;
+  /* Раньше был flex-wrap:wrap — при нехватке места элементы (дата,
+     фильтр пола, шестерёнка настроек, иконки "Мастера"/"Отзывы")
+     переносились на новую строку вперемешку и ломали шапку на 2-3
+     строки. Теперь это строго ОДНА строка: если совсем не хватает
+     места — появляется горизонтальная прокрутка внутри самой строки,
+     а не перенос строк. */
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  max-width: 100%;
+}
+
+.header-actions::-webkit-scrollbar {
+  display: none;
 }
 
 .date-navigation {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  flex-shrink: 0;
 }
 
 .date-navigation button {
@@ -243,7 +258,14 @@ body {
    высоты карточек в соседних колонках — свёрнутая карточка сразу
    освобождает место для следующей. */
 .dashboard-grid {
-  columns: 300px;
+  /* Жёсткое ограничение: на экранах шире 780px одновременно видно НЕ БОЛЕЕ
+     2 колонок мастеров (раньше было columns:300px — автоматически влезало
+     сколько угодно колонок на широком мониторе, из-за чего на экране сразу
+     оказывалось 4-6+ карточек). columns:2 задаёт РОВНО число колонок, а не
+     желаемую ширину — поэтому колонок больше двух не появится независимо от
+     ширины экрана. Ручная настройка числа колонок (попап "Настройки экрана")
+     продолжает работать как раньше и перекрывает это значение инлайн-стилем. */
+  columns: 2;
   column-gap: 1.5rem;
 }
 
@@ -259,44 +281,44 @@ body {
   border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  min-height: 500px;
+  /* Раньше здесь было 500px независимо от того, есть ли у мастера вообще
+     записи на этот день — карточка почти без записей превращалась в
+     сплошной пустой прямоугольник. Небольшой запас (чтобы шапка + пустая
+     область не выглядели "обрубленными"), но карточка теперь в основном
+     подстраивается под реальное содержимое. */
+  min-height: 220px;
 }
 
-/* Когда мастеров очень много (примерно от 5 и выше), одной колонке незачем
-   тянуться до 480px — уменьшаем желаемую ширину колонки, чтобы на широких
-   экранах помещалось больше колонок одновременно. */
-.dashboard-grid[data-density="compact"] {
-  columns: 260px;
-}
-
+/* Когда мастеров очень много (примерно от 5 и выше), карточка мастера уже
+   без того компактнее — но число видимых колонок всё равно ограничено
+   базовым правилом .dashboard-grid выше (не больше 2, см. columns:2). */
 .dashboard-grid[data-density="compact"] .master-column {
   max-width: 340px;
-  min-height: 420px;
+  min-height: 200px;
 }
 
-/* Адаптивность для панели */
-@media (max-width: 1024px) {
-  .dashboard-grid {
-    columns: 260px;
+/* Адаптивность для панели: на экранах ≤780px — не больше ОДНОГО мастера
+   на экране одновременно (columns:1 ниже), на экранах шире 780px — не
+   больше ДВУХ (columns:2 в базовом правиле .dashboard-grid выше). */
+@media (max-width: 780px) {
+  .dashboard-grid,
+  .dashboard-grid[data-density="compact"] {
+    columns: 1;
+    column-gap: 0;
   }
 }
 
 @media (max-width: 768px) {
-  .dashboard-grid {
-    columns: 1;
-    column-gap: 0;
-  }
-
   .master-column {
     max-width: none;
-    min-height: 400px;
+    min-height: 180px;
     margin: 0 0 1rem;
   }
 }
 
 @media (max-width: 480px) {
   .master-column {
-    min-height: 350px;
+    min-height: 160px;
   }
 }
 
@@ -372,7 +394,13 @@ body {
   padding: 0.8rem;
   flex: 1;
   overflow-y: auto;
-  min-height: calc(100vh - 260px);
+  /* Раньше требовало почти всю высоту экрана (calc(100vh - 260px))
+     независимо от количества записей — на день без записей это превращало
+     карточку в один сплошной пустой прямоугольник высотой почти во весь
+     экран. Теперь карточка занимает столько места, сколько нужно её
+     реальному содержимому (небольшой запас ниже, чтобы пустой день не
+     выглядел "обрубленным"). */
+  min-height: 120px;
 }
 
 /* ============================================
@@ -1067,7 +1095,7 @@ body {
 /* ========== Адаптивность ========== */
 @media (max-width: 1024px) {
   .column-content {
-    min-height: 450px;
+    min-height: 120px;
   }
 }
 
@@ -1083,13 +1111,20 @@ body {
   }
 
   .header-actions {
-    flex-direction: column;
-    align-items: stretch;
+    /* Раньше здесь было flex-direction:column + align-items:stretch — каждый
+       элемент (дата, фильтр пола, шестерёнка, иконки навигации) занимал свою
+       собственную строку на всю ширину. Теперь на мобильных это тоже ОДНА
+       строка (как и на десктопе, см. базовое правило .header-actions выше) —
+       если не хватает места, появляется горизонтальная прокрутка внутри
+       этой строки, а не перенос на новые строки. */
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 100%;
   }
 
   .date-navigation {
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
   .column-header {
@@ -1134,7 +1169,7 @@ body {
 
   .column-content {
     padding: 0.6rem;
-    min-height: 400px;
+    min-height: 100px;
   }
 
   .order-card {
@@ -1235,7 +1270,7 @@ body {
 
   .column-content {
     padding: 0.4rem;
-    min-height: 350px;
+    min-height: 90px;
   }
 
   .order-card {

@@ -38,8 +38,13 @@ const Dashboard = {
       grid.removeAttribute('data-density');
     }
 
+    // data-gender нужен панельному фильтру "Мужчины / Женщины / Все"
+    // (см. barber_panel/js/dashboard-controls.js) — определяем принадлежность
+    // мастера по тому, в каком массиве MASTERS_BY_GENDER он найден.
+    const feminineNames = new Set((MASTERS_BY_GENDER.feminine || []).map(m => m.name));
+
     grid.innerHTML = ALL_MASTERS.map(m => `
-      <div class="master-column" data-master="${m.name}">
+      <div class="master-column" data-master="${m.name}" data-gender="${feminineNames.has(m.name) ? 'feminine' : 'masculine'}">
         <div class="column-header" id="header${m.key}">
           <div class="master-avatar">
             <img src="../img/${m.avatar || 'placeholder-avatar.svg'}" alt="${m.name}" onerror="this.onerror=null;this.src='../img/placeholder-avatar.svg';" />
@@ -136,15 +141,26 @@ const Dashboard = {
     });
   },
 
+  // ===== СОКРАЩЁННЫЕ НАЗВАНИЯ ДНЕЙ НЕДЕЛИ =====
+  WEEKDAY_SHORT: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+
   // ===== ОБНОВЛЕНИЕ ОТОБРАЖЕНИЯ ДАТЫ =====
+  // Компактный формат для узкой шапки панели — "Пн, 08.09" вместо
+  // "понедельник, 8 сентября 2026 г.". Год не показываем (панель — это
+  // всегда "сегодня ± несколько дней", а не архив за прошлые годы); при
+  // необходимости его всё равно видно в заголовке вкладки/дате busy-попапа.
   updateDateDisplay: function() {
     const display = document.getElementById('currentDateDisplay');
     if (display) {
-      display.textContent = this.currentDate.toLocaleDateString('ru', { 
-        weekday: 'long', 
-        day: 'numeric', 
-        month: 'long', 
-        year: 'numeric' 
+      const day = String(this.currentDate.getDate()).padStart(2, '0');
+      const month = String(this.currentDate.getMonth() + 1).padStart(2, '0');
+      const weekday = this.WEEKDAY_SHORT[this.currentDate.getDay()];
+      display.textContent = `${weekday}, ${day}.${month}`;
+      display.title = this.currentDate.toLocaleDateString('ru', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
       });
       display.dataset.date = this.currentDate.toISOString().split('T')[0];
     }
@@ -183,6 +199,10 @@ const Dashboard = {
     // 2. Сбрасываем состояние синхронизации
     Sync.state.orders = [];
     Sync.state.busySlots = [];
+    // Переключение дня — это тоже "первая загрузка" для нового дня: заказы,
+    // которые уже существуют на этот день, не должны включать звук новой
+    // записи (см. Sync.smartUpdateOrders/_firstSyncDone в sync.js).
+    Sync._firstSyncDone = false;
     
     // ===== 3. ОБНОВЛЯЕМ LOCALSTORAGE =====
     // Удаляем все синхронизированные записи за текущую дату,

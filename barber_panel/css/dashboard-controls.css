@@ -1,0 +1,145 @@
+/* ============================================
+   barber_panel/css/dashboard-controls.css
+   ============================================
+   Стили для:
+   - Компактных ссылок "Мастера"/"Отзывы" (узкие иконки-«столбики» справа
+     в шапке — вместо широких текстовых кнопок);
+   - Иконки-шестерёнки "Настройки экрана" и её попапа (число столбцов);
+   - Переключателя "Все / Мужчины / Женщины" — фильтр колонок мастеров на
+     дашборде (см. barber_panel/js/dashboard-controls.js).
+
+   Логика — в dashboard-controls.js. Этот файл ничего не переопределяет в
+   существующих стилях панели, только добавляет свои классы. */
+
+/* ---------- Ручной выбор числа колонок (попап "Настройки экрана") ---------- */
+/* dashboard-controls.js ставит атрибут data-columns="N" на #dashboardGrid,
+   когда барбер выбирает число колонок вручную (не "Авто"). !important здесь
+   — намеренно: это должно гарантированно перекрывать и автоматический
+   потолок в 2 колонки (barber_styles.css, .dashboard-grid{columns:2}), и
+   адаптивный потолок в 1 колонку на экранах ≤780px — выбор барбера всегда
+   в приоритете, независимо от ширины экрана. */
+.dashboard-grid[data-columns] {
+  column-width: auto !important;
+}
+.dashboard-grid[data-columns="1"] { column-count: 1 !important; }
+.dashboard-grid[data-columns="2"] { column-count: 2 !important; }
+.dashboard-grid[data-columns="3"] { column-count: 3 !important; }
+.dashboard-grid[data-columns="4"] { column-count: 4 !important; }
+.dashboard-grid[data-columns="5"] { column-count: 5 !important; }
+.dashboard-grid[data-columns="6"] { column-count: 6 !important; }
+.dashboard-grid[data-columns="7"] { column-count: 7 !important; }
+.dashboard-grid[data-columns="8"] { column-count: 8 !important; }
+
+/* ---------- Иконка-кнопка (настройки) ---------- */
+.btn-icon {
+  background: var(--bg-input);
+  border: none;
+  color: var(--text-primary);
+  width: 2.2rem;
+  height: 2.2rem;
+  flex-shrink: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.btn-icon:hover {
+  background: var(--border-color);
+  color: var(--accent);
+}
+
+/* ---------- Компактная навигация "Мастера" / "Отзывы" ---------- */
+/* Узкие квадратные иконки, стоящие В РЯД (а не столбиком) — вместе с датой,
+   фильтром и настройками должны укладываться в ОДНУ строку шапки. Раньше
+   здесь стояло flex-direction:column, из-за чего эти две иконки складывались
+   друг на друга по вертикали и "вываливались" из общей строки шапки даже на
+   широких экранах — визуально ломая всю шапку на две строки. */
+.nav-compact {
+  display: flex;
+  flex-direction: row;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.nav-compact-btn {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 8px;
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.nav-compact-btn:hover {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+/* ---------- Фильтр "Все / Мужчины / Женщины" ---------- */
+.panel-gender-filter {
+  display: flex;
+  align-items: stretch;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background: var(--bg-input, var(--bg-primary));
+  flex-shrink: 0;
+}
+
+.pgf-option {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.82rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.pgf-option:hover {
+  color: var(--text-primary);
+}
+
+.pgf-option.active {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+/* Скрытые фильтром колонки — данные/синхронизация продолжают работать в
+   фоне, просто карточка не отображается, пока фильтр не переключат обратно. */
+.master-column.gender-filtered-out {
+  display: none !important;
+}
+
+/* ---------- Адаптивность ---------- */
+@media (max-width: 768px) {
+  /* Шапка на мобильных: заголовок остаётся своей строкой (см. barber_styles.css),
+     а весь блок управления (дата/"Сегодня"/фильтр/настройки/иконки) — ОДНОЙ
+     сплошной строкой под ним, без переноса каждого элемента на свою строку
+     (см. .header-actions в barber_styles.css — там теперь flex-wrap:nowrap
+     с горизонтальной прокруткой при нехватке места). */
+  .header-actions {
+    align-items: center;
+  }
+
+  .panel-gender-filter,
+  .btn-icon,
+  .nav-compact {
+    align-self: center;
+  }
+}

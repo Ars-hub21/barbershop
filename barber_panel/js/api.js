@@ -5,7 +5,7 @@
 // - Обновление статусов заказов и занятости
 
 const API = {
-  BASE_URL: 'https://script.google.com/macros/s/AKfycbyoobwP4KjK08nJe7gW3kxzbb6YknK2XFxfBUlzhrh7GV1wETQtr8l_yiQbhiLwhd56/exec',
+  BASE_URL: 'https://script.google.com/macros/s/AKfycbwdRQrCWRo0-MaW-IjtrD8fx843mfBqKrzdQE5dGYHTfK91bJd6nORrgfJz5yfH5wQ/exec',
 
   // ===== GET ЗАПРОС =====
   get: function(action, params = {}) {

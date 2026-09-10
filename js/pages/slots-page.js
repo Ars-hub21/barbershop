@@ -22,30 +22,38 @@ const SlotsPage = {
     this.currentDate = today;
 
     this._ensureSlotsWrapper();
+    this._initialRenderDone = false;
 
     // ЗАЩИТА: Если пакетный кэш еще скачивается из Google Таблиц, блокируем UI и ждем
     if (typeof GlobalCache !== 'undefined') {
-      if (GlobalCache.isReady && !GlobalCache.isLoading) {
-        this.updateFromCache();
-        this.renderCalendar();
-        this._autoFocusDate();
-      } else {
+      if (!GlobalCache.isReady || GlobalCache.isLoading) {
         this.showLoading(); // Включаем стильный спиннер из Части 3 CSS
         console.log('⏳ [SlotsPage] Пакетный кэш пуст или скачивается. Ждем завершения...');
-        
-        GlobalCache.addListener(() => {
+      }
+
+      // Подписываемся ОДИН РАЗ на ВСЕ обновления пакетного кэша — и на
+      // первоначальную готовность (если кэш ещё грузится), и на последующие
+      // живые обновления (точечный поллинг checkChanges раз в 15с, докачка
+      // следующих пакетов через ensureLoadedThrough). Раньше подписка
+      // оформлялась ТОЛЬКО если кэш ещё не был готов на момент захода на
+      // страницу — если кэш уже был тёплым (самый частый случай), живые
+      // обновления от поллинга никогда не долетали до экрана: кнопки времени
+      // не обновлялись сами, пока клиент не перевыберет дату вручную.
+      GlobalCache.addListener(() => {
+        this.hideLoading();
+        this.updateFromCache();
+        if (!this._initialRenderDone) {
+          this._initialRenderDone = true;
           console.log('🎯 [SlotsPage] Пакетный кэш успешно получен! Активация календаря.');
-          this.hideLoading();
-          this.updateFromCache();
           this.renderCalendar();
           this._autoFocusDate();
-        });
-      }
+        }
+      });
     } else {
       this.renderCalendar();
       this._autoFocusDate();
     }
-    
+
     this.initEvents();
   },
 
@@ -172,16 +180,12 @@ const SlotsPage = {
           // Если данные уже скачаны ранее — выводим кнопки времени мгновенно за 0мс
           self.updateFromCache();
         } else {
-          // ДАННЫХ НЕТ (Клиент ушел далеко вперед, например на 35-й или 65-й день)
+          // ДАННЫХ НЕТ (клиент ушёл дальше уже загруженного окна) — докачиваем
+          // недостающие пакеты по 14 дней один за другим (см.
+          // GlobalCache.ensureLoadedThrough), а не сразу весь диапазон целиком.
           self.showLoading(); // Включаем спиннер
-          
-          // Динамически вычисляем границы нового пакетного окна кратными 30 дням
-          const packetIndex = Math.floor(diffDays / 30); // для 35 дня это 1, для 65 дня это 2
-          const startOffset = packetIndex * 30;          // для 35 дня это 30, для 65 дня это 60
-          const endOffset = startOffset + 30;            // для 35 дня это 60, для 65 дня это 90
 
-          // Запускаем принудительную дозагрузку пакета с сервера Google Таблиц
-          GlobalCache.preloadRange(startOffset, endOffset, function() {
+          GlobalCache.ensureLoadedThrough(diffDays, function() {
             self.hideLoading();
             self.updateFromCache(); // Мгновенно выводим появившееся время на экран!
           });
@@ -190,33 +194,57 @@ const SlotsPage = {
     });
   },
 
-  // УМНЫЙ АЛГОРИТМ: Ищет ближайший день за 30 дней вперед, где есть окна для записи
+  // УМНЫЙ АЛГОРИТМ: Ищет ближайший день вперед, где есть окна для записи.
+  // Сканирует по мере загрузки пакетов (по 14 дней) — сначала то, что уже
+  // в кэше, и только если ничего не нашлось, докачивает следующий пакет и
+  // продолжает поиск, вместо того чтобы сразу требовать все 30+ дней разом.
+  MAX_SEARCH_DAYS: 60, // не ищем бесконечно далеко вперед
+
   goToNearestAvailableDate: function() {
     console.log('🔍 [SlotsPage] Запуск сканирования памяти на ближайшую свободную дату...');
+    this.showLoading();
+    this._scanForNearestDate(0);
+  },
+
+  _scanForNearestDate: function(fromDay) {
+    const self = this;
     const today = new Date();
     const masterName = this.masterName;
-    
-    for (let i = 0; i < 30; i++) {
+    const scanThrough = Math.min(GlobalCache.loadedDays, this.MAX_SEARCH_DAYS);
+
+    for (let i = fromDay; i < scanThrough; i++) {
       const targetDate = new Date(today);
       targetDate.setDate(today.getDate() + i);
       const dateStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, '0')}-${String(targetDate.getDate()).padStart(2, '0')}`;
-      
+
       // Спрашиваем у пакетного кэша данные без единого запроса к сети
       const slots = GlobalCache.getSlots(masterName, dateStr, this.totalDuration);
-      
+
       if (slots && slots.length > 0) {
         console.log(`🎯 [SlotsPage] Ближайшая дата найдена: ${dateStr}. Фокусируем календарь.`);
-        
+        this.hideLoading();
+
         // Меняем внутренний месяц и год календаря, если свободный день находится в следующем месяце
         this.currentMonth = targetDate.getMonth();
         this.currentYear = targetDate.getFullYear();
-        
+
         this.renderCalendar();
         this.selectDate(dateStr);
         return;
       }
     }
-    alert('⚠️ К сожалению, на ближайшие 30 дней все записи полностью заполнены.');
+
+    if (scanThrough >= this.MAX_SEARCH_DAYS) {
+      this.hideLoading();
+      alert(`⚠️ К сожалению, на ближайшие ${this.MAX_SEARCH_DAYS} дней все записи полностью заполнены.`);
+      return;
+    }
+
+    // В уже загруженном диапазоне свободных дней не нашлось — докачиваем
+    // следующий пакет (ещё 14 дней) и продолжаем поиск с того места, где остановились.
+    GlobalCache.ensureLoadedThrough(scanThrough, function() {
+      self._scanForNearestDate(scanThrough);
+    });
   },
 // js/pages/slots-page.js - Мгновенный календарь и умный автопоиск (Часть 3)
   showSelectedMaster: function(masterName) {

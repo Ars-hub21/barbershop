@@ -238,10 +238,19 @@ function initCardHandlers() {
 function handleOrderComplete(card) {
     const orderId = card.dataset.orderId;
     const priceEl = card.querySelector('.order-price');
-    const actualPrice = parseInt(priceEl.textContent.replace(/[^0-9]/g, ''));
-    
+    // ===== РАЗБОР ЦЕНЫ БЕЗ ПОТЕРИ ДИАПАЗОНА =====
+    // Раньше здесь был parseInt(text.replace(/[^0-9]/g,'')) — для точной
+    // цены это нормально, но если цена ещё оставалась диапазоном (услуга с
+    // "неточной" ценой, например "300–500", а барбер не назначил точную
+    // сумму через клик по цене), это слепляло обе границы в одно неверное
+    // число ("300–500" → 300500) и тире фактически пропадало. Теперь для
+    // диапазона в историю уходит сам диапазон строкой — ничего не теряется,
+    // и барбер видит его в истории таким же, каким он был на карточке.
+    const parsedPrice = parsePriceFromText(priceEl.textContent);
+    const actualPrice = parsedPrice.isRange ? parsedPrice.text : parsedPrice.value;
+
     if (!confirm('Отметить клиента как обслуженного?')) return;
-    
+
     API.addHistory({
         type: 'client',
         masterName: card.dataset.master,
@@ -287,7 +296,10 @@ function handleBusyComplete(card) {
         end = parts[1] || '';
     }
     
-    const price = parseInt(priceEl?.textContent.replace(/[^0-9]/g, '')) || 0;
+    // См. комментарий в handleOrderComplete выше — тот же разбор цены,
+    // сохраняющий диапазон с тире вместо того, чтобы склеивать его в мусорное число.
+    const parsedBusyPrice = parsePriceFromText(priceEl?.textContent || '');
+    const price = parsedBusyPrice.isRange ? parsedBusyPrice.text : parsedBusyPrice.value;
     const reason = reasonEl?.textContent || 'Занятость';
     
     // 1. Отправляем в историю

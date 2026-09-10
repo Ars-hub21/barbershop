@@ -6,6 +6,13 @@
 const Sync = {
   lastSyncTime: null,
   syncInterval: null,
+  // ===== ЗВУК: ПЕРВАЯ ЗАГРУЗКА =====
+  // При самом первом performFullSync() ещё нет предыдущего состояния — все
+  // уже существующие заказы выглядят как "новые" и раньше это заставляло
+  // проигрывать звук на КАЖДУЮ уже существующую запись сразу при открытии
+  // панели. Флаг ниже отличает "первая загрузка дня" (тихая) от реально
+  // новых заказов, которые появились уже после того, как барбер открыл панель.
+  _firstSyncDone: false,
   state: {
     orders: [],
     busySlots: []
@@ -13,8 +20,50 @@ const Sync = {
 
   init: function() {
     this.lastSyncTime = new Date().toISOString();
+    this.unlockAudioOnFirstInteraction();
     this.performFullSync();
     this.startPolling();
+  },
+
+  // ===== РАЗБЛОКИРОВКА АВТОВОСПРОИЗВЕДЕНИЯ ЗВУКА =====
+  // Браузеры не разрешают воспроизводить звук через код, пока пользователь
+  // хоть раз не взаимодействовал со страницей (клик/тап) — это защита от
+  // навязчивой рекламы, но из-за неё звук новой записи мог вообще никогда
+  // не прозвучать, если барбер просто оставил панель открытой и не трогал
+  // экран. Здесь при ПЕРВОМ клике/тапе по странице разово запускаем и сразу
+  // ставим на паузу оба звука — это "разблокирует" их для браузера, и все
+  // дальнейшие программные audio.play() (например, из 10-секундного опроса)
+  // после этого проходят нормально.
+  unlockAudioOnFirstInteraction: function() {
+    if (this._audioUnlocked) return;
+
+    const unlock = () => {
+      if (this._audioUnlocked) return;
+      this._audioUnlocked = true;
+
+      ['newOrderSound', 'notificationSound'].forEach(id => {
+        const audio = document.getElementById(id);
+        if (!audio) return;
+        const playPromise = audio.play();
+        if (playPromise && typeof playPromise.then === 'function') {
+          playPromise.then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+          }).catch(() => {
+            // Тихо игнорируем — попробуем снова при следующем реальном
+            // проигрывании, разблокировка не критична для остального кода.
+          });
+        }
+      });
+
+      document.removeEventListener('click', unlock);
+      document.removeEventListener('touchstart', unlock);
+      document.removeEventListener('keydown', unlock);
+    };
+
+    document.addEventListener('click', unlock);
+    document.addEventListener('touchstart', unlock);
+    document.addEventListener('keydown', unlock);
   },
 
   // ===== ПОЛНАЯ СИНХРОНИЗАЦИЯ =====
@@ -53,12 +102,17 @@ const Sync = {
   // ===== УМНОЕ ОБНОВЛЕНИЕ ЗАКАЗОВ =====
   smartUpdateOrders: function(newOrders) {
     localStorage.setItem('orders', JSON.stringify(newOrders));
-    
+
     const oldOrders = this.state.orders;
-    
+    // Самая первая синхронизация за день (панель только что открылась) —
+    // все заказы, которые уже были сделаны раньше, не должны считаться
+    // "новыми" и не должны включать звук — иначе при каждом открытии/
+    // обновлении панели проигрывался бы звук на все существующие записи.
+    const isFirstSync = !this._firstSyncDone;
+
     const oldIds = new Set(oldOrders.map(o => o.id));
     const newIds = new Set(newOrders.map(o => o.id));
-    
+
     const removedOrderIds = [...oldIds].filter(id => !newIds.has(id));
     removedOrderIds.forEach(id => {
       const card = document.querySelector(`.order-card[data-order-id="${id}"]`);
@@ -67,26 +121,27 @@ const Sync = {
         console.log(`🗑️ Удалена карточка заказа: ${id}`);
       }
     });
-    
+
     const newOrderIds = [...newIds].filter(id => !oldIds.has(id));
     newOrderIds.forEach(id => {
       const order = newOrders.find(o => o.id === id);
       if (order) {
         this.renderSingleOrder(order);
-        this.playNewOrderSound();
+        if (!isFirstSync) this.playNewOrderSound();
         console.log(`➕ Добавлена карточка заказа: ${id}`);
       }
     });
-    
+
     newOrders.forEach(order => {
       const card = document.querySelector(`.order-card[data-order-id="${order.id}"]`);
       if (card) {
         this.updateOrderCard(card, order);
       }
     });
-    
+
     this.state.orders = newOrders;
-    
+    this._firstSyncDone = true;
+
     console.log(`📊 Заказы: ${oldOrders.length} → ${newOrders.length}`);
   },
 

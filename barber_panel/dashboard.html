@@ -5,15 +5,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Панель барберов</title>
-  <script src="../js/core/site-config.js"></script>
+  <script src="../js/core/site-config.js?v=20260910"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800&family=Syncopate:wght@700&family=Nunito:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <link rel="stylesheet" href="../css/theme.css" />
-  <link rel="stylesheet" href="css/barber_styles.css" />
-  <link rel="stylesheet" href="css/columnToggle.css" />
-  <link rel="stylesheet" href="css/sync-indicator.css" />
+  <link rel="stylesheet" href="../css/theme.css?v=20260910" />
+  <link rel="stylesheet" href="css/barber_styles.css?v=20260910" />
+  <link rel="stylesheet" href="css/columnToggle.css?v=20260910" />
+  <link rel="stylesheet" href="css/sync-indicator.css?v=20260910" />
+  <link rel="stylesheet" href="css/dashboard-controls.css?v=20260910" />
 </head>
 <body>
   <header class="dashboard-header">
@@ -21,13 +22,31 @@
       <div class="header-content">
         <h1 class="dashboard-title"><i class="fas fa-cut"></i> Панель барберов</h1>
         <div class="header-actions">
-          <a href="masters.html" class="btn btn-secondary btn-sm"><i class="fas fa-users"></i> Мастера</a>
-          <a href="barber_reviews.html" class="btn btn-secondary btn-sm"><i class="fas fa-star"></i> Отзывы</a>
           <div class="date-navigation">
             <button id="prevDayBtn"><i class="fas fa-chevron-left"></i></button>
             <span id="currentDateDisplay"></span>
             <button id="nextDayBtn"><i class="fas fa-chevron-right"></i></button>
             <button id="todayBtn" class="btn btn-sm">Сегодня</button>
+          </div>
+
+          <!-- Фильтр "Мужчины / Женщины / Все" — какие колонки мастеров
+               показывать (см. js/dashboard-controls.js). Чисто визуальный,
+               локальный для этого устройства. -->
+          <div class="panel-gender-filter" id="panelGenderFilter" role="group" aria-label="Показывать мастеров">
+            <button type="button" class="pgf-option active" data-value="all" title="Показывать всех мастеров">Все</button>
+            <button type="button" class="pgf-option" data-value="masculine" title="Только мужская команда"><i class="fas fa-scissors"></i></button>
+            <button type="button" class="pgf-option" data-value="feminine" title="Только женская команда"><i class="fas fa-hand-sparkles"></i></button>
+          </div>
+
+          <button type="button" class="btn-icon" id="dashboardSettingsBtn" title="Настройки экрана">
+            <i class="fas fa-sliders-h"></i>
+          </button>
+
+          <!-- Компактные ссылки — вместо текстовых кнопок "Мастера"/"Отзывы"
+               слева от даты, теперь узкие иконки-«столбики» справа. -->
+          <div class="nav-compact">
+            <a href="masters.html" class="nav-compact-btn" title="Мастера"><i class="fas fa-users"></i></a>
+            <a href="barber_reviews.html" class="nav-compact-btn" title="Отзывы"><i class="fas fa-star"></i></a>
           </div>
         </div>
       </div>
@@ -71,6 +90,30 @@
       </div>
     </div>
 
+    <!-- Попап "Настройки экрана" -->
+    <div id="dashboardSettingsPopup" class="popup-overlay" style="display:none;">
+      <div class="popup-content">
+        <div class="popup-header">
+          <h3>Настройки экрана</h3>
+          <button class="popup-close" id="settingsPopupClose">&times;</button>
+        </div>
+        <div class="popup-body">
+          <div class="form-group">
+            <label>Столбцов мастеров на главном экране</label>
+            <select id="columnCountSelect">
+              <option value="auto">Авто (подстраивается под ширину экрана)</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <audio id="newOrderSound" preload="auto">
       <source src="sounds/new-order.mp3" type="audio/mpeg">
     </audio>
@@ -84,14 +127,15 @@
        сайт (js/data/masters.js). Правьте состав мастеров через страницу
        "Мастера" (masters.html) — она же формирует обновлённый файл для
        выгрузки на GitHub, чтобы клиентский сайт и панель не рассинхронились. -->
-  <script src="../js/data/masters.js"></script>
-  <script src="js/utils/sync-indicator.js"></script>
-  <script src="js/utils/helpers.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/dashboard.js"></script>
-  <script src="js/sync.js"></script>
-  <script src="js/busy-popup.js"></script>
-  <script src="js/barber_script.js"></script>
-  <script src="components/columnToggle.js"></script>
+  <script src="../js/data/masters.js?v=20260910"></script>
+  <script src="js/utils/sync-indicator.js?v=20260910"></script>
+  <script src="js/utils/helpers.js?v=20260910"></script>
+  <script src="js/api.js?v=20260910"></script>
+  <script src="js/dashboard.js?v=20260910"></script>
+  <script src="js/sync.js?v=20260910"></script>
+  <script src="js/busy-popup.js?v=20260910"></script>
+  <script src="js/barber_script.js?v=20260910"></script>
+  <script src="components/columnToggle.js?v=20260910"></script>
+  <script src="js/dashboard-controls.js?v=20260910"></script>
 </body>
 </html>

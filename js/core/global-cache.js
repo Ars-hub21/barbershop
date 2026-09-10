@@ -5,6 +5,25 @@ const GlobalCache = {
   isLoading: false,
   listeners: [],
 
+  // РАЗМЕР ПАКЕТА ЗАГРУЗКИ (в днях). Раньше при первом заходе на сайт сразу
+  // скачивался весь месяц (30 дней) по КАЖДОМУ мастеру параллельно одним
+  // Promise.all — то есть мужская версия (2 мастера) слала 60 запросов к
+  // Google Apps Script одновременно, а женская версия (5 мастеров) — уже
+  // 150 запросов разом. У Apps Script есть лимит на число одновременных
+  // выполнений скрипта — при таком всплеске часть запросов обрывалась с
+  // ошибкой, и (см. ниже) эта ошибка раньше сохранялась в кэш как "слотов
+  // нет" НАВСЕГДА, из-за чего казалось, что даты вообще не грузятся.
+  // Теперь загрузка идёт пакетами по BATCH_SIZE дней: сначала только первые
+  // 14 дней по всем существующим мастерам (не важно, 1 их или больше), а
+  // следующие 14 дней подгружаются пакетно только когда клиент реально
+  // пролистал календарь дальше уже загруженного диапазона (см.
+  // ensureLoadedThrough ниже и js/pages/slots-page.js).
+  BATCH_SIZE: 14,
+
+  // Сколько дней от сегодня уже гарантированно загружены в кэш (пакетами
+  // по BATCH_SIZE). Восстанавливается из sessionStorage вместе с самим кэшем.
+  loadedDays: 0,
+
   initCacheStructure: function() {
     if (typeof masters !== 'undefined' && Array.isArray(masters)) {
       masters.forEach(m => {
@@ -44,30 +63,46 @@ const GlobalCache = {
   // ОБНОВЛЕННЫЙ МЕТОД: Пакетный сбор работает на любой странице, если кэш пуст
 // js/core/global-cache.js - Бесконечный докачиваемый кэш (Кусок для замены)
 
-  // Базовый запуск: теперь качает первые 30 дней от текущей даты
+  // Базовый запуск: теперь качает только первый пакет (BATCH_SIZE дней)
+  // от текущей даты — остальное подгружается по требованию (см.
+  // ensureLoadedThrough).
   preloadAllSlots: function() {
     this.initCacheStructure();
 
     if (sessionStorage.getItem('barberCacheLoaded') === 'true' && this.loadCache()) {
+      // Восстанавливаем из sessionStorage вместе с кэшем и то, сколько дней
+      // уже было загружено пакетами — иначе после перезагрузки страницы
+      // счётчик обнулился бы и календарь думал бы, что загружен только
+      // первый пакет, даже если пользователь уже пролистал дальше.
+      const savedLoadedDays = parseInt(sessionStorage.getItem('barberCacheLoadedDays') || '0', 10);
+      this.loadedDays = savedLoadedDays > 0 ? savedLoadedDays : this.BATCH_SIZE;
       this.notifyListeners();
       return;
     }
 
-    // Загружаем первый стартовый пакет на 30 дней вперед
-    this.preloadRange(0, 30);
+    // Загружаем первый стартовый пакет — BATCH_SIZE (14) дней вперед
+    this.preloadRange(0, this.BATCH_SIZE);
   },
 
-  // УНИВЕРСАЛЬНЫЙ МЕТОД: Скачивает любой указанный диапазон дней и пришивает к кэшу
+  // УНИВЕРСАЛЬНЫЙ МЕТОД: Скачивает любой указанный диапазон дней и пришивает
+  // к кэшу — ОДНИМ POST-запросом через уже существующее на бэкенде действие
+  // 'getFreeSlotsBatch' (см. Router.gs/Slots.gs), а не отдельным GET-запросом
+  // на КАЖДОГО мастера и КАЖДЫЙ день по отдельности. Раньше пакет в 14/30
+  // дней превращался в дни×мастеров одновременных запросов (60 для мужской
+  // версии, 150 для женской) — Google Apps Script ограничивает число
+  // одновременных выполнений скрипта, и часть запросов при таком всплеске
+  // обрывалась с ошибкой. Один POST с массивом дат и мастеров решает это
+  // полностью — сервер сам проходит по датам в цикле и отдаёт всё разом.
   preloadRange: function(startOffset, endOffset, callback) {
     if (this.isLoading) return;
     this.isLoading = true;
 
-    console.log(`🚀 [GlobalCache] Дозагрузка пакета дней с ${startOffset} по ${endOffset} вперед...`);
+    console.log(`🚀 [GlobalCache] Дозагрузка пакета дней с ${startOffset} по ${endOffset} вперед (один batch-запрос)...`);
 
     const today = new Date();
     const activeMasters = Object.keys(this.slots);
     const dates = [];
-    
+
     // Формируем сетку дат для запрашиваемого окна
     for (let i = startOffset; i < endOffset; i++) {
       const d = new Date(today);
@@ -82,35 +117,72 @@ const GlobalCache = {
       dates.push(d.toISOString().split('T')[0]);
     }
 
-    const promises = [];
+    // Не запрашиваем повторно дни, которые уже реально есть в кэше хотя бы
+    // у одного мастера (сравниваем по первому мастеру — все мастера
+    // загружаются одним и тем же пакетным запросом, так что либо загружены
+    // все сразу, либо ни один).
+    const firstMaster = activeMasters[0];
+    const datesToFetch = dates.filter(dateStr => !(this.slots[firstMaster] && this.slots[firstMaster][dateStr] !== undefined));
 
-    activeMasters.forEach(master => {
-      dates.forEach(dateStr => {
-        // Если данные по этому дню уже есть — не качаем заново, берем из памяти
-        if (this.slots[master] && this.slots[master][dateStr]) return;
-
-        const p = API.getFreeSlots(master, dateStr, 15)
-          .then(data => {
-            if (!this.slots[master]) this.slots[master] = {};
-            this.slots[master][dateStr] = (data && data.success) ? data.slots : [];
-          })
-          .catch(() => {
-            if (!this.slots[master]) this.slots[master] = {};
-            this.slots[master][dateStr] = [];
-          });
-        promises.push(p);
-      });
-    });
-
-    Promise.all(promises).then(() => {
+    if (datesToFetch.length === 0 || activeMasters.length === 0) {
       this.isReady = true;
       this.isLoading = false;
-      this.saveCache(); // Перезаписываем sessionStorage, дополняя его новыми днями
-      sessionStorage.setItem('barberCacheLoaded', 'true');
-      console.log(`🎯 [GlobalCache] Пакет дней успешно докачан в память. Всего дат в кэше: ${Object.keys(this.slots[activeMasters[0]]).length}`);
-      
+      this.loadedDays = Math.max(this.loadedDays, endOffset);
       this.notifyListeners();
       if (typeof callback === 'function') callback();
+      return;
+    }
+
+    API.post('getFreeSlotsBatch', { masters: activeMasters, dates: datesToFetch, duration: 15 })
+      .then(data => {
+        const batch = (data && data.success && data.slots) ? data.slots : null;
+
+        activeMasters.forEach(master => {
+          if (!this.slots[master]) this.slots[master] = {};
+          datesToFetch.forEach(dateStr => {
+            // ВАЖНО: при ошибке сервера НЕ записываем "[]" — оставляем день
+            // незагруженным (undefined), чтобы его можно было спокойно
+            // повторить позже (например, точечным поллингом checkChanges,
+            // как только клиент откроет именно этот день), а не запомнить
+            // навсегда как "слотов нет" из-за одного временного сбоя.
+            if (batch && batch[master] && batch[master][dateStr] !== undefined) {
+              this.slots[master][dateStr] = batch[master][dateStr];
+            }
+          });
+        });
+      })
+      .catch(() => {
+        // Сетевая ошибка на весь пакет — та же логика: ничего не кэшируем
+        // как пустое, просто оставляем эти дни незагруженными для повтора.
+      })
+      .then(() => {
+        this.isReady = true;
+        this.isLoading = false;
+        this.loadedDays = Math.max(this.loadedDays, endOffset);
+        this.saveCache(); // Перезаписываем sessionStorage, дополняя его новыми днями
+        sessionStorage.setItem('barberCacheLoaded', 'true');
+        sessionStorage.setItem('barberCacheLoadedDays', String(this.loadedDays));
+        console.log(`🎯 [GlobalCache] Пакет дней успешно докачан в память (загружено дней от сегодня: ${this.loadedDays}).`);
+
+        this.notifyListeners();
+        if (typeof callback === 'function') callback();
+      });
+  },
+
+  // НОВОЕ: гарантирует, что дни вплоть до targetOffsetDays (включительно)
+  // уже загружены в кэш — если нет, докачивает следующие пакеты по
+  // BATCH_SIZE дней один за другим (а не сразу весь недостающий диапазон),
+  // пока не покроет нужный день. Используется календарём (slots-page.js),
+  // когда клиент листает дальше уже загруженного окна.
+  ensureLoadedThrough: function(targetOffsetDays, callback) {
+    if (targetOffsetDays < this.loadedDays) {
+      if (typeof callback === 'function') callback();
+      return;
+    }
+    const nextStart = this.loadedDays;
+    const nextEnd = nextStart + this.BATCH_SIZE;
+    this.preloadRange(nextStart, nextEnd, () => {
+      this.ensureLoadedThrough(targetOffsetDays, callback);
     });
   },
 

@@ -55,14 +55,28 @@ document.addEventListener('DOMContentLoaded', function() {
       return phone;
     },
 
+    // Разбор цены ДЛЯ АРИФМЕТИКИ (сумма за месяц) — диапазон ("300–500",
+    // услуга с неточной ценой) переводим в его нижнюю границу, потому что
+    // точная сумма ещё не назначена и складывать диапазоны как есть нельзя.
+    // Для уже точных цен просто возвращает число как есть.
     parsePrice: function(price) {
       if (!price) return '0';
       const str = String(price).replace(/\s/g, '');
-      if (str.includes('-') || str.includes('–')) {
-        const parts = str.split(/[-–]/);
+      if (str.includes('-') || str.includes('–') || str.includes('—')) {
+        const parts = str.split(/[-–—]/);
         return parts[0] || '0';
       }
       return str;
+    },
+
+    // Разбор цены ДЛЯ ОТОБРАЖЕНИЯ в списке истории — в отличие от
+    // parsePrice выше, сохраняет диапазон целиком ("300–500"), а не
+    // обрезает его до первого числа. Раньше в списке тоже использовался
+    // parsePrice, из-за чего тире у неточных цен пропадало прямо на
+    // экране (клиент "300–500 ₽" показывался как "300 ₽").
+    formatPriceDisplay: function(price) {
+      if (!price) return '0';
+      return String(price).replace(/\s/g, '');
     },
 
     renderHistory: function() {
@@ -104,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
           .map(h => {
             const date = this.formatDate(h.date);
             const time = this.formatTime(h.start);
-            const price = this.parsePrice(h.price);
+            const price = this.formatPriceDisplay(h.price);
             const clientName = h.clientName || '—';
             const services = h.services || '—';
             const phone = this.formatPhone(h.phone || '');
